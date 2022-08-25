@@ -1,11 +1,11 @@
 <template>
     <div class="home">
-        <p class="text-xl" @click="playSection()">Play</p>
+        <p class="text-xl" @click="startPlaying()">Play</p>
         <p class="text-xl" @click="stopPlaying()">Stop</p>
         <p class="text-xl" @click="changeNote()">Change Note</p>
         <select @change="changeTempo" v-model="tempo">
             <option value="80">80</option>
-            <option value="120" selected>120</option>
+            <option value="120">120</option>
             <option value="140">140</option>
         </select>
         <div>
@@ -18,88 +18,130 @@
 </template>
 
 <script>
-// @ is an alias to /src
 import HelloWorld from "@/components/HelloWorld.vue";
+import { sequenceExpression } from "@babel/types";
+import { NodeTypes } from "@vue/compiler-core";
 import * as Tone from "tone";
 import { Sequence } from "tone";
+import * as Serialism from "total-serialism";
 
 const synth = new Tone.MonoSynth({
     oscillator: {
+        frequency: 440,
         type: "square",
     },
     envelope: {
-        attack: 0.01,
-        decay: 0.2,
-        release: 0.1,
-        sustain: 0.1,
+        attack: 0.05,
+        attackCurve: 'linear',
+        decay: 0.3,
+        decayCurve: 'exponential',
+        release: 0.8,
+        releaseCurve: 'exponential',
+        sustain: 0.4
     },
-    volume: -8,
+    filter: {
+        Q: 1,
+        rollof: -12,
+        type: 'lowpass'
+    },
+    filterEnvelope: {
+        attack: 0.001,
+        attackCurve: 'linear',
+        baseFrequency: 300,
+        decay: 0.7,
+        decayCurve: 'exponential',
+        exponent: 2,
+        octaves: 4,
+        release: 0.8,
+        releaseCurve: 'exponential',
+        sustain: 0.1
+    },
+    volume: -16,
+}).toDestination();
+
+const synth2 = new Tone.MonoSynth({
+    oscillator: {
+        frequency: 440,
+        type: "square",
+    },
+    envelope: {
+        attack: 0.05,
+        attackCurve: 'linear',
+        decay: 0.3,
+        decayCurve: 'exponential',
+        release: 0.8,
+        releaseCurve: 'exponential',
+        sustain: 0.4
+    },
+    filter: {
+        Q: 1,
+        rollof: -12,
+        type: 'lowpass'
+    },
+    filterEnvelope: {
+        attack: 0.001,
+        attackCurve: 'linear',
+        baseFrequency: 300,
+        decay: 0.7,
+        decayCurve: 'exponential',
+        exponent: 2,
+        octaves: 4,
+        release: 0.8,
+        releaseCurve: 'exponential',
+        sustain: 0.1
+    },
 }).toDestination();
 
 const bassSynth = new Tone.MonoSynth({
     oscillator: {
+        frequency: 440,
         type: "square",
     },
     envelope: {
-        attack: 0.01,
-        decay: 0.2,
-        release: 0.1,
-        sustain: 0.1,
+        attack: 0.05,
+        attackCurve: 'linear',
+        decay: 0.3,
+        decayCurve: 'exponential',
+        release: 0.8,
+        releaseCurve: 'exponential',
+        sustain: 0.4
     },
-    volume: -8,
+    filter: {
+        Q: 1,
+        rollof: -12,
+        type: 'lowpass'
+    },
+    filterEnvelope: {
+        attack: 0.001,
+        attackCurve: 'linear',
+        baseFrequency: 300,
+        decay: 0.7,
+        decayCurve: 'exponential',
+        exponent: 2,
+        octaves: 4,
+        release: 0.8,
+        releaseCurve: 'exponential',
+        sustain: 0.1
+    },
+    volume: -16,
 }).toDestination();
 
-const scaleDegreeToHalfSteps = {
-    b1: -1,
-    1: 0,
-    "#1": 1,
-    b2: 1,
-    sus2: 2,
-    2: 2,
-    "#2": 3,
-    b3: 3,
-    3: 4,
-    "#3": 5,
-    b4: 4,
-    sus: 5,
-    4: 5,
-    "#4": 6,
-    b5: 6,
-    5: 7,
-    "#5": 8,
-    b6: 8,
-    6: 9,
-    "#6": 10,
-    d7: 9,
-    b7: 10,
-    7: 11,
-    "#7": 12,
-    b8: 11,
-    8: 12,
-    "#8": 13,
-    b9: 13,
-    9: 14,
-    "#9": 15,
-    b10: 15,
-    10: 16,
-    "#10": 17,
-    b11: 16,
-    11: 17,
-    "#11": 18,
-    b12: 18,
-    12: 19,
-    "#12": 20,
-    b13: 20,
-    13: 21,
-    b14: 22,
-    14: 23,
-    15: 24,
-};
+const Algo = Serialism.Algorithmic
 
 // Scales
 const SCALES = {
-    MAJOR_SCALE: [0, 2, 4, 5, 7, 9, 11, 12],
-    NATURAL_MINOR_SCALE: [0, 2, 3, 5, 7, 8, 10, 12],
+    MAJOR: [0, 2, 4, 5, 7, 9, 11, 12],
+    MINOR: [0, 2, 3, 5, 7, 8, 10, 12],
+    MELODIC_MINOR: [0, 2, 3, 5, 7, 9, 11, 12],
+    DORIAN: [0, 2, 3, 5, 7, 9, 10, 12],
+    PHRYGIAN: [0, 1, 3, 5, 7, 8, 10, 12],
+    LYDIAN: [0, 2, 4, 6, 7, 9, 11, 12],
+    MIXOLYDIAN: [0, 2, 4, 5, 7, 9, 10, 12],
+    LOCRIAN: [0, 1, 3, 5, 6, 8, 10, 12],
+    NATURAL_MINOR: [0, 2, 3, 5, 7, 8, 10, 12],
+    MAJOR_PENTATONIC: [0, 2, 4, 7, 9, 12, 14, 16, 19, 21, 24],
+    MINOR_PENTATONIC: [0, 3, 5, 7, 10, 12, 15, 17, 19, 22, 24],
+
 };
 
 // Chords
@@ -109,100 +151,148 @@ const CHORDS = {
     DIMINISHED_TRIAD: [0, 3, 6],
 };
 
-// Patterns
-const PATTERNS = {
-    II_V_I_MAJOR: [2, 4, 6, 8, 7, 5, 4, 2, 1, 3, 5, 7, 5, 3, 1],
-};
+const PATTERNS = [
+    [0, 0, 0, 0, 5, 5, 5, 5, 3, 3, 3, 3, 2, 2, 2, 2]
+]
 
-// Rythms
-const RYTHMS = {
-    II_V_I: ["8n", "8n", "8n", "8n", "8n", "8n", "8n", "8n", "8n", "8n", "8n", "4n", "8n", "8n", "8n"],
-};
+let numSynthNotes = 12;
+let numSynth2Notes = 64;
+let numBassNotes = 4;
+let bassMelody = ['C4'];
+let synthMelody = ['C4'];
+let synth2Melody = ['C4'];
+let root = 52
+let synthRoot = root
+let bassRoot = synthRoot - 24
+let bpm = 120
 
-var noteIndex = -1;
-var notes = ["C4", "E4", "G4", "B4"];
-var durationIndex = -1;
-var durations = ["8n", "16n", "16n", "8n"];
-var liveNotes = [];
-var rythm = [];
+// Synths Patterns and Sequences
+const synthPattern = new Tone.Pattern((time, note) => {
+    synth.triggerAttackRelease(note, "32n", time);
+}, synthMelody, "random").start(0);
 
-function scheduleNext(time) {
-    notes = liveNotes
-    noteIndex = noteIndex < notes.length - 1 ? noteIndex + 1 : 0;
-    var myNote = notes[noteIndex];
-    durations = rythm;
-    durationIndex = durationIndex < durations.length - 1 ? durationIndex + 1 : 0;
+const bassSeq = new Tone.Sequence((time, note) => {
+    bassSynth.triggerAttackRelease(note, "16n", time);
+}, bassMelody).start(0);
 
-    var myDuration = durations[durationIndex];
+const synth2Part = new Tone.Part(((time, value) => {
+    synth2.triggerAttackRelease(value.note, "4n", time, value.velocity);
+})).start(0);
 
-    //play note
-    synth.triggerAttackRelease(myNote, myDuration, time);
-    //schedule the next event relative to the current time by prefixing "+"
-    Tone.Transport.schedule(scheduleNext, "+" + myDuration);
-}
+synth2Part.loop = true
+synth2Part.loopStart = 0
+synth2Part.loopEnd = "4m"
 
-function playLiveUpdate() {
-    if (Tone.Transport.state != "started") {
-        noteIndex = -1;
-        durationIndex = -1;
-        [liveNotes, rythm] = makeMelody(46)
-        console.log(notes, rythm)
-        scheduleNext("+0.1", notes, rythm);
-        Tone.Transport.start("+0.2");
-    }
-}
+function fillMelodyArray(melody) {
+    let seconds = 30 / bpm
+    let melodyArray = []
+    let time = 0
 
-function midiToFrequency(midiArray, root) {
-    let scale = [];
-
-    for (var i = 0; i < midiArray.length; i++) {
-        scale.push(Tone.Frequency(root + midiArray[i], "midi").toFrequency());
+    for (let i = 0; i < 64; i++) {
+        if (melody[i] != 0) {
+            melodyArray.push({ time: time, note: Tone.Frequency(melody[i], 'midi').toFrequency(), velocity: 0.5 })
+        }
+        time = time + seconds
     }
 
-    return scale;
+    return melodyArray
 }
 
-function chordFromScale(chordArray, scaleArray) {
-    let chord = [];
+function generateBassMelody() {
+    bassMelody = []
 
-    for (var i = 0; i < chordArray.length; i++) {
-        chord.push(scaleArray[chordArray[i]]);
+    // randomizar esse
+    let euclid = Algo.euclid(64, 54)
+    let auxIndex = 0
+    let bassPattern = 0
+    let note
+
+    if (bassPattern == 0) {
+        //euclidean
+        for (let i = 0; i < PATTERNS[0].length; i++) {
+            for (let j = 0; j < numBassNotes; j++) {
+                //randomizar pattern
+                note = (bassRoot + PATTERNS[0][i]) * euclid[auxIndex];
+                if (note == 0) {
+                    bassMelody.push(0);
+                } else {
+                    note = Tone.Frequency(note, 'midi')
+                    bassMelody.push(note);
+                }
+
+                auxIndex++
+            }
+        }
+    } else {
+        //1,2
+        for (let i = 0; i < PATTERNS[0].length; i++) {
+            for (let j = 0; j < numBassNotes; j++) {
+                //randomizar pattern
+                if (auxIndex % 2 == 0) {
+                    note = (bassRoot + PATTERNS[0][i]);
+                } else {
+                    note = (bassRoot + PATTERNS[0][i]) + 12
+                }
+                note = Tone.Frequency(note, 'midi')
+                bassMelody.push(note);
+
+                auxIndex++
+            }
+        }
     }
 
-    return chord;
+    console.log(bassMelody);
 }
 
-function getRandomArbitrary(min, max) {
-    return Math.floor(Math.random() * (max - min) + min);
-}
+function generateSynth2Melody() {
+    synth2Melody = []
 
-function randomIndex(obj) {
-    const keys = Object.keys(obj);
+    // randomizar esse
+    let euclid = Algo.fastEuclid(64, 42)
+    let auxIndex = 0
+    let synth2Notes = []
+    let note
 
-    return keys[Math.floor(Math.random() * keys.length)];
-}
-
-function patternToSteps(pattern) {
-    let steps = [];
-
-    for (var i = 0; i < pattern.length; i++) {
-        steps.push(scaleDegreeToHalfSteps[pattern[i]]);
+    //euclidean
+    for (let i = 0; i < numSynth2Notes; i++) {
+        note = (synthRoot + SCALES['MINOR_PENTATONIC'][Math.floor(Math.random() * SCALES['MINOR_PENTATONIC'].length)]) * euclid[auxIndex];
+        synth2Notes.push(note);
+        auxIndex++
     }
 
-    return steps;
+    synth2Melody = fillMelodyArray(synth2Notes);
+
+    for (let i = 0; i < synth2Melody.length; i++) {
+        synth2Part.add(synth2Melody[i]);
+    }
+
+    console.log(synth2Melody)
+    console.log(synth2Notes);
 }
 
-function makeMelody(key) {
-    let pattern = patternToSteps(PATTERNS['II_V_I_MAJOR']);
-    let notes = midiToFrequency(pattern, key);
-    let rythm = RYTHMS['II_V_I'];
+function generateSynthMelody() {
+    synthMelody = []
+    let synthNotes = []
 
-    // var result = {};
-    // for (let i = 0; i < notes.length; i++) {
-    //     result[notes[i]] = rythm[i];
-    // }
+    for (let i = 0; i < numSynthNotes; i++) {
+        let note = synthRoot + SCALES['MINOR'][Math.floor(Math.random() * SCALES['MINOR'].length)];
+        synthNotes.push(note);
+        note = Tone.Frequency(note, 'midi').toFrequency()
+        synthMelody.push(note);
+    }
+    synthMelody.sort()
 
-    return [notes, rythm];
+    console.log(synthNotes);
+}
+
+function setMelodies() {
+    bassSeq.set({
+        events: bassMelody
+    })
+    synthPattern.set({
+        values: synthMelody
+    })
+    synth2Part.add(synth2Melody)
 }
 
 export default {
@@ -213,27 +303,49 @@ export default {
     },
     data() {
         return {
-            tempo: 120,
+            tempo: bpm,
             scales: null,
             chords: null,
         };
     },
-    created() {},
+    created() {
+        Tone.Transport.timeSignature = [4, 4]
+        Tone.Transport.loop = true
+        Tone.Transport.loopStart = 0
+        Tone.Transport.loopEnd = "16m"
+
+        synthPattern.interval = "16n"
+    },
     methods: {
         changeTempo() {
-            Tone.Transport.bpm.value = this.tempo;
+            Tone.Transport.bpm.rampTo(this.tempo, 0.001);
         },
-        playSection() {
-            // Tone.start();
-            // Tone.Transport.bpm.value = this.tempo;
-            // Tone.Transport.start();
-            playLiveUpdate();
+        startPlaying() {
+            Tone.start()
+            generateBassMelody();
+            generateSynthMelody();
+            generateSynth2Melody();
+
+            setMelodies();
+            //Tone.Transport.scheduleRepeat(setBassMelody, '8n');
+            //Tone.Transport.scheduleRepeat(console.log(Tone.Transport.beat), '4n');
+            Tone.Transport.start("+0.1");
+
         },
         stopPlaying() {
-            Tone.Transport.stop();
-            Tone.Transport.cancel(0);
+            if (Tone.Transport.state == "started") {
+                Tone.Transport.stop();
+                Tone.Transport.cancel(0);
+            }
         },
-        changeNote() {},
+        changeNote() {
+            synthRoot = synthRoot - 1
+            bassRoot = bassRoot - 1
+            generateBassMelody();
+            generateSynthMelody();
+            generateSynth2Melody();
+            setMelodies();
+        },
     },
 };
 </script>
