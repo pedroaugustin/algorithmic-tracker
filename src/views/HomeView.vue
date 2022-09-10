@@ -1,18 +1,98 @@
 <template>
     <div class="home">
-        <p class="text-xl" @click="startPlaying()">Play</p>
-        <p class="text-xl" @click="stopPlaying()">Stop</p>
-        <p class="text-xl" @click="changeNote()">Change Note</p>
-        <select @change="changeTempo" v-model="tempo">
-            <option value="80">80</option>
-            <option value="120">120</option>
-            <option value="130">130</option>
-        </select>
-        <div>
-            <p v-for="scale in scales" :key="scale" class="inline m-2">{{  scale  }}</p>
+        <div class="flex justify-center mb-2">
+            <input class="text-[20px] bg-slate-100 shadow w-[340px] h-12 border-2 p-2 border-black text-black rounded-md font-['Karma']" v-model="textSeed" type="text" placeholder="Type Here"/>
+            <div class="h-12">
+            <p class="text-[50px] leading-10 text-white ml-2 font-['8_Bit_Arcade'] playText cursor-pointer hover:text-[#37d706]" @click="startPlaying()">play</p>
+            </div>
         </div>
-        <div>
-            <p v-for="chord in chords" :key="chord" class="inline m-2">{{  chord  }}</p>
+        <span class="text-[10px] text-gray-900 p-2 font-['8_Bit_Hud']">Type a word or press play to generate a random seed</span>
+        <div class="ml-16 mr-16 mt-2 border-4 bg-slate-50/80 rounded-md border-neutral-800 divide-slate-400 divide-x-2 divide-y-2 shadow grid grid-cols-5">
+            <div class="col-span-1 p-1">
+                <div
+                    class="text-[10px] mt-2 text-black mb-1 font-['8_Bit_Hud']"
+                >
+                    Bass Synth
+                </div>
+            </div>
+            <div class="col-span-1 p-1">
+                <div
+                    class="text-[10px] mt-2 text-black mb-2 font-['8_Bit_Hud']"
+                >
+                    Synth 1
+                </div>
+            </div>
+            <div class="col-span-1 p-1">
+                <div
+                    class="text-[10px] mt-2 text-black mb-2 font-['8_Bit_Hud']"
+                >
+                    Synth 2
+                </div>
+            </div>
+            <div class="col-span-1 p-1">
+                <div
+                    class="text-[10px] mt-2 text-black mb-2 font-['8_Bit_Hud']"
+                >
+                    Synth 3
+                </div>
+            </div>
+            <div class="col-span-1 p-1">
+                <div
+                    class="text-[10px] mt-2 text-black mb-2 font-['8_Bit_Hud']"
+                >
+                    Drums
+                </div>
+            </div>
+            <div class="col-span-1">
+                <div
+                    v-for="(note, index) in bassNotes"
+                    :key="index"
+                    class="text-[10px] text-black font-['8_Bit_Hud']"
+                    :class="{ 'bg-neutral-600 text-sky-50': index == progressTick }"
+                >
+                    {{ note }}
+                </div>
+            </div>
+            <div class="col-span-1">
+                <div
+                    v-for="(note, index) in synth1Notes"
+                    :key="index"
+                    class="text-[10px] text-black font-['8_Bit_Hud']"
+                    :class="{ 'bg-neutral-600 text-sky-50': index == progressTick }"
+                >
+                    {{ note }}
+                </div>
+            </div>
+            <div class="col-span-1">
+                <div
+                    v-for="(note, index) in synth2Notes"
+                    :key="index"
+                    class="text-[10px] text-black font-['8_Bit_Hud']"
+                    :class="{ 'bg-neutral-600 text-sky-50': index == progressTick }"
+                >
+                    {{ note }}
+                </div>
+            </div>
+            <div class="col-span-1">
+                <div
+                    v-for="(note, index) in synth3Notes"
+                    :key="index"
+                    class="text-[10px] text-black font-['8_Bit_Hud']"
+                    :class="{ 'bg-neutral-600 text-sky-50': index == progressTick }"
+                >
+                    {{ note }}
+                </div>
+            </div>
+            <div class="col-span-1">
+                <div
+                    v-for="(note, index) in drumNotes"
+                    :key="index"
+                    class="text-[10px] text-black font-['8_Bit_Hud']"
+                    :class="{ 'bg-neutral-600 text-sky-50': index == progressTick }"
+                >
+                    {{ note }}
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -20,13 +100,18 @@
 <script>
 import HelloWorld from "@/components/HelloWorld.vue";
 import * as Tone from "tone";
-import * as Serialism from "total-serialism";
+import * as TotalSerialism from "total-serialism";
+import { OmniOscillator } from "tone";
 
 const reverb = new Tone.Reverb().toDestination();
-const tremolo = new Tone.Tremolo(8, 1).toDestination().start();
+const vibrato = new Tone.Vibrato({
+    frequency: 10,
+    depth: 0.2,
+}).toDestination();
 
-const Rand = Serialism.Stochastic;
-Rand.seed(666)
+const Rand = TotalSerialism.Stochastic;
+const TL = TotalSerialism.Translate;
+const Algo = TotalSerialism.Algorithmic;
 
 const hihatSynth = new Tone.NoiseSynth({
     envelope: {
@@ -39,10 +124,10 @@ const hihatSynth = new Tone.NoiseSynth({
 }).toDestination();
 
 const kickSynth = new Tone.MembraneSynth({
-    pitchDecay: 0.20,
+    pitchDecay: 0.2,
     octaves: 12,
     oscillator: {
-        type: "triangle"
+        type: "sawtooth",
     },
     envelope: {
         attack: 0.01,
@@ -50,7 +135,7 @@ const kickSynth = new Tone.MembraneSynth({
         sustain: 1,
         release: 0.001,
     },
-    volume: -6
+    volume: -18,
 }).toDestination();
 
 const snareSynth = new Tone.NoiseSynth({
@@ -128,43 +213,27 @@ const synth2 = new Tone.MonoSynth({
         release: 0.8,
         releaseCurve: "exponential",
     },
-    volume: -24,
-}).toDestination().connect(reverb);
+    volume: -30,
+}).toDestination();
 
-const synth3 = new Tone.MonoSynth({
+const synth3 = new Tone.Synth({
     oscillator: {
-        frequency: 440,
-        type: "sawtooth",
+        type: "pwm",
     },
-    portamento: 0.05,
+    portamento: 0.02,
     envelope: {
         attack: 0.001,
         attackCurve: "linear",
         decay: 0.001,
         decayCurve: "exponential",
         sustain: 1,
-        release: 0.8,
+        release: 0.5,
         releaseCurve: "exponential",
     },
-    filter: {
-        Q: 1,
-        rollof: -12,
-        type: "lowpass",
-    },
-    filterEnvelope: {
-        attack: 0.001,
-        attackCurve: "linear",
-        baseFrequency: 400,
-        decay: 0.01,
-        decayCurve: "exponential",
-        exponent: 2,
-        octaves: 8,
-        sustain: 1,
-        release: 0.8,
-        releaseCurve: "exponential",
-    },
-    volume: -30,
-}).connect(tremolo).connect(reverb).toDestination();
+    volume: -28,
+})
+    .toDestination()
+    .connect(vibrato);
 
 const bassSynth = new Tone.MonoSynth({
     oscillator: {
@@ -200,8 +269,6 @@ const bassSynth = new Tone.MonoSynth({
     volume: -20,
 }).toDestination();
 
-const Algo = Serialism.Algorithmic;
-
 // Scales
 const SCALES = {
     MAJOR: [0, 2, 4, 5, 7, 9, 11, 12],
@@ -218,50 +285,50 @@ const SCALES = {
 };
 
 const PROGRESSIONS = [
-    [0, 0, 0, 0, 5, 5, 5, 5, 3, 3, 3, 3, 2, 2, 2, 2], // I-VI-IV-III
-    [0, 0, 0, 0, 3, 3, 3, 3, 0, 0, 0, 0, 6, 6, 6, 6],
+    ["IV", "V", "III", "VI"],
+    ["IVmaj7", "III7", "II7", "Imaj7"]
 ];
+
+const PROGRESSIONSCALES = [
+    [SCALES["MIXOLYDIAN"], SCALES["MIXOLYDIAN"], SCALES["MIXOLYDIAN"], SCALES["MIXOLYDIAN"]],
+    [SCALES["MIXOLYDIAN"], SCALES["MIXOLYDIAN"], SCALES["MIXOLYDIAN"], SCALES["MIXOLYDIAN"]],
+    ];
 
 const FIFTHS = [60, 67, 62, 69, 64, 71, 66, 61, 68, 63, 70, 65];
 
-const CHORDS = {
-    MAJOR: [0, 4, 7],
-    MAJOR_7: [0, 4, 7, 11],
-    MINOR: [0, 3, 7],
-    MINOR_7: [0, 3, 7, 11],
-    DIMINISHED: [0, 3, 6],
-}
-
-let numBassNotes = 4;
-let bassMelody = ["C4"];
-let synthMelody = ["C4"];
-let synth2Melody = [];
-let synth3Melody = [];
-let kickPattern = []
-let hihatPattern = []
-let snarePattern = []
+let bassNotes,
+    synth1Notes,
+    synth2Notes,
+    synth3Notes,
+    drumNotes,
+    kickPattern,
+    hihatPattern,
+    snarePattern,
+    bassMelody,
+    synth1Melody,
+    synth2Melody,
+    synth3Melody = [];
+let currentChords = [];
 let fifthIndex = 0;
 let root = 0;
 let synthRoot = root;
 let bassRoot = root - 24;
 let bpm = 130;
+let progressionIndex = 0;
+let cAutomaton = new Algo.Automaton();
 
-// Synths Patterns and Sequences
-const synthPattern = new Tone.Pattern(
-    (time, note) => {
-        synth.triggerAttackRelease(note, "32n", time);
-    },
-    synthMelody,
-    "upDown"
-).start("+0.1");
+// Synths Parts
+const bassPart = new Tone.Part((time, value) => {
+    bassSynth.triggerAttackRelease(value.note, "16n", time, value.velocity);
+}).start("+0.1");
 
-const bassSeq = new Tone.Sequence((time, note) => {
-    bassSynth.triggerAttackRelease(note, "16n", time);
-}, bassMelody).start("+0.1");
+const synth1Part = new Tone.Part((time, value) => {
+    synth.triggerAttackRelease(value.note, "16n", time, value.velocity);
+}).start("+0.1");
 
 const synth2Part = new Tone.Part((time, value) => {
     synth2.triggerAttackRelease(value.note, "32n", time, value.velocity);
-})//.start("+0.1");
+}).start("+0.1");
 
 const synth3Part = new Tone.Part((time, value) => {
     synth3.triggerAttackRelease(value.note, value.duration, time, value.velocity);
@@ -269,58 +336,67 @@ const synth3Part = new Tone.Part((time, value) => {
 
 const kickPart = new Tone.Part((time, value) => {
     kickSynth.triggerAttackRelease(value.note, "32n", time, value.velocity);
-})//.start("+0.1");
+}).start("+0.1");
 
 const hhPart = new Tone.Part((time, value) => {
     hihatSynth.triggerAttackRelease("64n", time, value.velocity);
-})//.start("+0.1");
+}).start("+0.1");
 
 const snarePart = new Tone.Part((time, value) => {
     snareSynth.triggerAttackRelease("32n", time, value.velocity);
-})//.start("+0.1");
-
+}).start("+0.1");
 
 function fillDrums() {
     let seconds = Tone.Time("16n").toSeconds();
     kickPattern = [];
     hihatPattern = [];
     snarePattern = [];
+    drumNotes = [];
     let time = 0;
 
-    kickPart.clear()
-    hhPart.clear()
-    snarePart.clear()
+    kickPart.clear();
+    hhPart.clear();
+    snarePart.clear();
+    if (1){ //Rand.coin(1)[0]) {
+        for (let i = 0; i < 128; i++) {
+            if (i % 8 == 0 || i == 0) {
+                kickPattern.push({ time: time, note: 20, velocity: 1 });
+                drumNotes.push("KCK");
+            } else if (i % 8 == 4) {
+                snarePattern.push({ time: time, note: 60, velocity: 1 });
+                drumNotes.push("SNR");
+            } else if (i % 8 == 2) {
+                if (Rand.pick(1, [1, 2, 3, 4, 5]) == 1) {
+                    kickPattern.push({ time: time, note: 20, velocity: 1 });
+                    drumNotes.push("KCK");
+                } else {
+                    hihatPattern.push({ time: time, note: 30, velocity: 1 });
+                    drumNotes.push("HH");
+                }
+            } else {
+                hihatPattern.push({ time: time, note: 30, velocity: 1 });
+                drumNotes.push("HH");
+            }
 
-    for (let i = 0; i < 256; i++) {
-        if (i % 8 == 0 || i == 0) {
-            kickPattern.push({ time: time, note: 20, velocity: 1 });
-        } else if (i % 8 == 4) {
-            snarePattern.push({ time: time, note: 60, velocity: 0.8 });
-        } else if (i % 2 == 0) {
-            hihatPattern.push({ time: time, note: 50, velocity: 1 });
-        } else if (Rand.pick(1, [1, 2, 3, 4, 5]) == 1) {
-            snarePattern.push({ time: time, note: 20, velocity: 1 });
-        } else {
-            hihatPattern.push({ time: time, note: 20, velocity: 1 });
+            time = time + seconds;
         }
 
-        time = time + seconds;
-    }
+        for (let i = 0; i < kickPattern.length; i++) {
+            kickPart.add(kickPattern[i]);
+        }
 
-    for (let i = 0; i < kickPattern.length; i++) {
-        kickPart.add(kickPattern[i]);
-    }
+        for (let i = 0; i < hihatPattern.length; i++) {
+            hhPart.add(hihatPattern[i]);
+        }
 
-    for (let i = 0; i < hihatPattern.length; i++) {
-        hhPart.add(hihatPattern[i]);
+        for (let i = 0; i < snarePattern.length; i++) {
+            snarePart.add(snarePattern[i]);
+        }
+    } else {
+        for (let i = 0; i < 128; i++) {
+            drumNotes.push("-");
+        }
     }
-
-    for (let i = 0; i < snarePattern.length; i++) {
-        snarePart.add(snarePattern[i]);
-    }
-
-    //console.log(hihatPattern)
-    //console.log(kickPattern)
 }
 
 function fillMelodyArray(melody) {
@@ -330,22 +406,12 @@ function fillMelodyArray(melody) {
 
     for (let i = 0; i < 128; i++) {
         if (melody[i] != 0) {
-            melodyArray.push({ time: time, duration: i % 2 == 0 ? "4n" : "32n", note: Tone.Frequency(melody[i], "midi").toFrequency(), velocity: 1 });
-        }
-        time = time + seconds;
-    }
-
-    return melodyArray;
-}
-
-function fillMelody8nArray(melody) {
-    let seconds = Tone.Time("8n").toSeconds();
-    let melodyArray = [];
-    let time = 0;
-
-    for (let i = 0; i < 64; i++) {
-        if (melody[i] != 0) {
-            melodyArray.push({ time: time, duration: i % 2 == 0 ? "4n" : "32n", note: Tone.Frequency(melody[i], "midi").toFrequency(), velocity: 1 });
+            melodyArray.push({
+                time: time,
+                duration: i % 2 == 0 ? "4n" : "32n",
+                note: Tone.Frequency(melody[i], "midi").toFrequency(),
+                velocity: 1,
+            });
         }
         time = time + seconds;
     }
@@ -355,145 +421,183 @@ function fillMelody8nArray(melody) {
 
 function generateBassMelody() {
     bassMelody = [];
+    bassNotes = [];
+    bassPart.clear();
 
-    // randomizar esse
-    let euclid = Algo.euclid(64, 54);
+    let euclid = Algo.euclid(128, Rand.random(1, 60, 80)[0]);
     let auxIndex = 0;
-    let bassPattern = 0;
+    let bassPattern = Rand.random(1, 0, 1)[0];
     let note;
 
-    if (bassPattern == 0) {
-        //euclidean
-        for (let i = 0; i < PROGRESSIONS[0].length; i++) {
-            for (let j = 0; j < numBassNotes; j++) {
-                //randomizar pattern
-                note = (bassRoot + PROGRESSIONS[0][i]) * euclid[auxIndex];
-                if (note == 0) {
-                    bassMelody.push(0);
-                } else {
-                    note = Tone.Frequency(note, "midi").toFrequency();
-                    bassMelody.push(note);
-                }
+    if (1){ //Rand.coin(1)[0]) {
+        if (bassPattern == 0) {
+            //euclidean
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 32; j++) {
+                    note = (bassRoot + currentChords[i][Rand.random(1, 0, currentChords[i].length)]) * euclid[auxIndex];
+                    bassNotes.push(note);
 
-                auxIndex++;
+                    auxIndex++;
+                }
             }
+        } else {
+            //1,2
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 32; j++) {
+                    if (auxIndex % 4 == 0) {
+                        note = bassRoot + currentChords[i][0];
+                    } else if (auxIndex % 2 == 0) {
+                        note = bassRoot + currentChords[i][0] + 12;
+                    } else {
+                        note = 0;
+                    }
+                    bassNotes.push(note);
+
+                    auxIndex++;
+                }
+            }
+        }
+
+        bassMelody = fillMelodyArray(bassNotes);
+
+        for (let i = 0; i < bassMelody.length; i++) {
+            bassPart.add(bassMelody[i]);
         }
     } else {
-        //1,2
-        for (let i = 0; i < PROGRESSIONS[0].length; i++) {
-            for (let j = 0; j < numBassNotes; j++) {
-                //randomizar pattern
-                if (auxIndex % 2 == 0) {
-                    note = bassRoot + PROGRESSIONS[1][i];
-                } else {
-                    note = bassRoot + PROGRESSIONS[1][i] + 12;
-                }
-                note = Tone.Frequency(note, "midi").toFrequency();
-                bassMelody.push(note);
-
-                auxIndex++;
-            }
+        for (let j = 0; j < 128; j++) {
+            bassNotes.push(0);
         }
-    }
 
-    console.log(bassMelody);
+        bassMelody = fillMelodyArray(bassNotes);
+    }
 }
 
 function generateSynthMelody() {
-    synthMelody = [];
+    synth1Melody = [];
+    synth1Notes = [];
+    synth1Part.clear();
+
     let note = 0;
-    let octaveNote = 0;
 
-    for (let i = 0; i < SCALES["MINOR"].length; i++) {
-        note = synthRoot + SCALES["MINOR"][i];
-        octaveNote = note + 12
-        note = Tone.Frequency(note, "midi").toFrequency();
-        octaveNote = Tone.Frequency(octaveNote, "midi").toFrequency();
-        synthMelody.push(note);
-        synthMelody.push(octaveNote);
+    if (1){ //Rand.coin(1)[0]) {
+        for (let i = 0; i < 4; i++) {
+            for (let j = 0; j < 32; j++) {
+                note =
+                    synthRoot -
+                    12 +
+                    currentChords[i][Rand.random(1, 0, currentChords[i].length)] +
+                    Rand.choose(1, [0, 12, 24])[0];
+                synth1Notes.push(note);
+            }
+        }
+
+        synth1Melody = fillMelodyArray(synth1Notes);
+
+        for (let i = 0; i < synth1Melody.length; i++) {
+            synth1Part.add(synth1Melody[i]);
+        }
+    } else {
+        for (let j = 0; j < 128; j++) {
+            synth1Notes.push(0);
+        }
+
+        synth1Melody = fillMelodyArray(synth1Notes);
     }
-
-    synthMelody.sort(function (a, b) { return a - b });
-    //console.log(synthMelody);
 }
 
 function generateSynth2Melody() {
     synth2Melody = [];
+    synth2Notes = [];
     synth2Part.clear();
 
-    // randomizar esse
-    let euclid = Algo.fastEuclid(128, 78);
+    let euclid = Algo.fastEuclid(128, Rand.random(1, 60, 100));
     let auxIndex = 0;
-    let synth2Notes = [];
     let note;
 
-    //euclidean
-    for (let i = 0; i < PROGRESSIONS[1].length; i++) {
-        for (let j = 0; j < 8; j++) {
-            note = (synthRoot + PROGRESSIONS[1][i] + (SCALES["MINOR_PENTATONIC"][Math.floor(Math.random() * SCALES["MINOR_PENTATONIC"].length)])) * euclid[auxIndex];
-            synth2Notes.push(note);
-            auxIndex++;
+    if (1){ //Rand.coin(1)[0]) {
+        //euclidean
+        for (let i = 0; i < 4; i++) {
+            for (let j = 0; j < 32; j++) {
+                note =
+                    (synthRoot +
+                        currentChords[i][0] +
+                        PROGRESSIONSCALES[progressionIndex][i][
+                            Rand.random(1, 0, PROGRESSIONSCALES[progressionIndex][i].length)
+                        ]) *
+                    euclid[auxIndex];
+                synth2Notes.push(note);
+                auxIndex++;
+            }
         }
+
+        synth2Melody = fillMelodyArray(synth2Notes);
+
+        for (let i = 0; i < synth2Melody.length; i++) {
+            synth2Part.add(synth2Melody[i]);
+        }
+    } else {
+        for (let j = 0; j < 128; j++) {
+            synth2Notes.push(0);
+        }
+
+        synth2Melody = fillMelodyArray(synth2Notes);
     }
-
-    synth2Melody = fillMelodyArray(synth2Notes);
-
-    for (let i = 0; i < synth2Melody.length; i++) {
-        synth2Part.add(synth2Melody[i]);
-    }
-
-    //console.log(synth2Melody);
 }
 
 function generateSynth3Melody() {
     synth3Melody = [];
+    synth3Notes = [];
     synth3Part.clear();
 
-    // randomizar esse
     let auxIndex = 0;
-    let synth3Notes = [];
     let note;
+    let gen = cAutomaton.next();
 
-    let ca = new Algo.Automaton();
-    // feed with 40 randomly generated values 0-1
-    ca.feed(Rand.coin(128));
-    ca.rule(122);
-    let gen = ca.next();
+    if (1){ //Rand.coin(1)[0]) {
+        for (let i = 0; i < 4; i++) {
+            for (let j = 0; j < 32; j++) {
+                if (j == 0) {
+                    note = synthRoot + currentChords[i][0];
+                } else {
+                    note =
+                        (synthRoot +
+                            currentChords[i][0] +
+                            PROGRESSIONSCALES[progressionIndex][i][
+                                Rand.random(1, 0, PROGRESSIONSCALES[progressionIndex][i].length)
+                            ]) *
+                        gen[auxIndex];
+                }
 
-    //euclidean
-    for (let i = 0; i < PROGRESSIONS[1].length; i++) {
-        for (let j = 0; j < 4; j++) {
-            note = (synthRoot + PROGRESSIONS[1][i] + (CHORDS["MINOR"][Math.floor(Math.random() * CHORDS["MINOR"].length)])) * gen[auxIndex];
-            synth3Notes.push(note);
-            auxIndex++;
+                synth3Notes.push(note);
+                auxIndex++;
+            }
         }
+
+        synth3Melody = fillMelodyArray(synth3Notes);
+
+        for (let i = 0; i < synth3Melody.length; i++) {
+            synth3Part.add(synth3Melody[i]);
+        }
+    } else {
+        for (let j = 0; j < 128; j++) {
+            synth3Notes.push(0);
+        }
+
+        synth3Melody = fillMelodyArray(synth3Notes);
     }
-
-    console.log(synth3Notes);
-    synth3Melody = fillMelody8nArray(synth3Notes);
-
-    for (let i = 0; i < synth3Melody.length; i++) {
-        synth3Part.add(synth3Melody[i]);
-    }
-
-    //console.log("ae" , synth3Melody);
-}
-
-function setMelodies() {
-    bassSeq.set({
-        events: bassMelody,
-    });
-    synthPattern.set({
-        values: synthMelody,
-    });
 }
 
 function setup() {
     Tone.Transport.timeSignature = [4, 4];
     Tone.Transport.loop = true;
     Tone.Transport.loopStart = 0;
-    Tone.Transport.loopEnd = "8m";
-    synthPattern.interval = "16n";
+    Tone.Transport.loopEnd = "16m";
+    bassPart.loop = true;
+    bassPart.loopStart = 0;
+    bassPart.loopEnd = "8m";
+    synth1Part.loop = true;
+    synth1Part.loopStart = 0;
+    synth1Part.loopEnd = "8m";
     synth2Part.loop = true;
     synth2Part.loopStart = 0;
     synth2Part.loopEnd = "8m";
@@ -506,30 +610,41 @@ function setup() {
     hhPart.loop = true;
     hhPart.loopStart = 0;
     hhPart.loopEnd = "8m";
-    fifthIndex = Math.floor(Math.random() * FIFTHS.length)
+    snarePart.loop = true;
+    snarePart.loopStart = 0;
+    snarePart.loopEnd = "8m";
+    fifthIndex = Rand.random(1, 0, FIFTHS.length);
     root = FIFTHS[fifthIndex];
 }
 
 function setRoot() {
-    let upOrDown = Math.floor(Math.random() * 10)
+    let upOrDown = Rand.random(1, 0, 1)[0];
 
-    if (upOrDown % 2 == 0) {
+    if (upOrDown == 0) {
         if (fifthIndex + 1 > FIFTHS.length) {
-            fifthIndex = FIFTHS[0];
+            fifthIndex = 0;
         } else {
             fifthIndex = fifthIndex + 1;
         }
     } else {
         if (fifthIndex - 1 < 0) {
-            fifthIndex = FIFTHS[FIFTHS.length];
+            fifthIndex = FIFTHS.length;
         } else {
             fifthIndex = fifthIndex - 1;
         }
     }
 
-    root = FIFTHS[fifthIndex]
-    synthRoot = root
-    bassRoot = root - 36
+    root = FIFTHS[fifthIndex];
+    synthRoot = root;
+    bassRoot = root - 36;
+
+    progressionIndex = Rand.random(1, 0, PROGRESSIONS.length)
+    currentChords = TL.chordsFromNumerals(PROGRESSIONS[progressionIndex]);
+    console.log(currentChords)
+}
+
+function fillDisplayNotes(notes) {
+    return notes.map(item => (item == 0 ? "-" : TL.midiToNote(item)));
 }
 
 function generateNewPatterns() {
@@ -538,7 +653,6 @@ function generateNewPatterns() {
     generateSynthMelody();
     generateSynth2Melody();
     generateSynth3Melody();
-    setMelodies();
     fillDrums();
 }
 
@@ -551,24 +665,69 @@ export default {
     data() {
         return {
             tempo: bpm,
+            bassNotes: {},
+            synth1Notes: {},
+            synth2Notes: {},
+            synth3Notes: {},
+            drumNotes: {},
+            progressTick: 0,
             scales: null,
             chords: null,
+            modulationFrequency: 2,
+            textSeed: "",
+            playing: 0,
         };
     },
     created() {
         setup();
     },
+    mounted() {
+        for(let i = 0 ; i < 128 ; i++){
+            this.bassNotes[i] = "-"
+            this.synth1Notes[i] = "-"
+            this.synth2Notes[i] = "-"
+            this.synth3Notes[i] = "-"
+            this.drumNotes[i] = "-"
+        }
+    },
     methods: {
         changeTempo() {
             Tone.Transport.bpm.rampTo(this.tempo, 0.001);
         },
+        generateText() {
+            var result = "";
+            var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            var charactersLength = characters.length;
+            for (var i = 0; i < 15; i++) {
+                result += characters.charAt(Math.floor(Math.random() * charactersLength));
+            }
+            return result;
+        },
         startPlaying() {
-            Tone.start();
-            Tone.Transport.bpm.rampTo(this.tempo, 0.001);
-            Tone.Transport.scheduleRepeat(time => {
-                generateNewPatterns();
-            }, "8m");
-            Tone.Transport.start("+0.1");
+            if (!this.playing) {
+                this.playing = 1;
+
+                if (this.textSeed == "") {
+                    this.textSeed = this.generateText()
+                } 
+
+                Rand.seed(this.stringHash(this.textSeed));
+
+                // feed with 40 randomly generated values 0-1
+                cAutomaton.feed(Rand.coin(128));
+                cAutomaton.rule(Rand.random(1, 1, 200)[0]);
+
+                Tone.start();
+                Tone.Transport.bpm.rampTo(this.tempo, 0.001);
+                Tone.Transport.scheduleRepeat(time => {
+                    generateNewPatterns();
+                    this.changeNotes();
+                }, "16m");
+                Tone.Transport.scheduleRepeat(time => {
+                    this.progressDisplay();
+                }, "16n");
+                Tone.Transport.start("+0.1");
+            }
         },
         stopPlaying() {
             if (Tone.Transport.state == "started") {
@@ -576,10 +735,53 @@ export default {
                 Tone.Transport.cancel(0);
             }
         },
-        changeNote() {
-            Tone.start();
-            synth3.triggerAttackRelease("C4", "2n");
+        stringHash(str) {
+            // https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript
+            let h1 = 1779033703,
+                h2 = 3144134277,
+                h3 = 1013904242,
+                h4 = 2773480762;
+
+            for (let i = 0, k; i < str.length; i++) {
+                k = str.charCodeAt(i);
+                h1 = h2 ^ Math.imul(h1 ^ k, 597399067);
+                h2 = h3 ^ Math.imul(h2 ^ k, 2869860233);
+                h3 = h4 ^ Math.imul(h3 ^ k, 951274213);
+                h4 = h1 ^ Math.imul(h4 ^ k, 2716044179);
+            }
+            h1 = Math.imul(h3 ^ (h1 >>> 18), 597399067);
+            h2 = Math.imul(h4 ^ (h2 >>> 22), 2869860233);
+            h3 = Math.imul(h1 ^ (h3 >>> 17), 951274213);
+            h4 = Math.imul(h2 ^ (h4 >>> 19), 2716044179);
+
+            return ((((h1 ^ h2 ^ h3 ^ h4) >>> (0 * (h2 ^ h1))) >>> (0 * (h3 ^ h1))) >>> (0 * (h4 ^ h1))) >>> 0;
+        },
+        changeNotes() {
+            this.bassNotes = fillDisplayNotes(bassNotes);
+            this.synth1Notes = fillDisplayNotes(synth1Notes);
+            this.synth2Notes = fillDisplayNotes(synth2Notes);
+            this.synth3Notes = fillDisplayNotes(synth3Notes);
+            this.drumNotes = drumNotes;
+        },
+        progressDisplay() {
+            this.progressTick == 128 ? (this.progressTick = 0) : (this.progressTick = this.progressTick + 1);
+        },
+        setModulation() {
+            synth3.oscillator.modulationFrequency.value = this.modulationFrequency;
         },
     },
 };
 </script>
+<style scoped>
+
+.fontStroke{
+    -webkit-text-stroke: 4px black;
+}
+
+.playText{
+    -webkit-text-stroke: 2px black;
+    text-shadow: 1px 5px 1px black;
+    font-weight: bold;
+}
+
+</style>
