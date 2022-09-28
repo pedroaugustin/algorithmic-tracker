@@ -1,47 +1,123 @@
 <template>
     <div class="home">
         <div class="flex justify-center mb-2">
-            <input class="text-[20px] bg-slate-100 shadow w-[340px] h-12 border-2 p-2 border-black text-black rounded-md font-['Karma']" v-model="textSeed" type="text" placeholder="Type Here"/>
+            <input
+                class="text-[20px] bg-slate-100 shadow w-[340px] h-12 border-2 p-2 border-black text-black rounded-md font-['Karma']"
+                v-model="textSeed"
+                type="text"
+                placeholder="Type Here"
+            />
             <div class="h-12">
-            <p class="text-[50px] leading-10 text-white ml-2 font-['8_Bit_Arcade'] playText cursor-pointer hover:text-[#37d706]" @click="startPlaying()">play</p>
+                <p
+                    class="text-[50px] leading-10 text-white ml-2 font-['8_Bit_Arcade'] playText cursor-pointer hover:text-[#37d706]"
+                    @click="startPlaying()"
+                    v-if="!playing"
+                >
+                    play
+                </p>
+                <p
+                    class="text-[50px] leading-10 text-white ml-2 font-['8_Bit_Arcade'] playText cursor-pointer hover:text-[#37d706]"
+                    @click="stopPlaying()"
+                    v-if="playing && !paused"
+                >
+                    pause
+                </p>
+                <p
+                    class="text-[50px] leading-10 text-white ml-2 font-['8_Bit_Arcade'] playText cursor-pointer hover:text-[#37d706]"
+                    @click="resumePlaying()"
+                    v-if="paused"
+                >
+                    resume
+                </p>
+            </div>
+            <div class="h-12">
+                <p
+                    class="text-[30px] leading-10 text-white ml-2 font-['8_Bit_Arcade'] playText cursor-pointer hover:text-[#37d706]"
+                    @click="resetPlaying()"
+                >
+                    reset
+                </p>
             </div>
         </div>
-        <span class="text-[10px] text-gray-900 p-2 font-['8_Bit_Hud']">Type a word or press play to generate a random seed</span>
-        <div class="ml-16 mr-16 mt-2 border-4 bg-slate-50/80 rounded-md border-neutral-800 divide-slate-400 divide-x-2 divide-y-2 shadow grid grid-cols-5">
-            <div class="col-span-1 p-1">
-                <div
-                    class="text-[10px] mt-2 text-black mb-1 font-['8_Bit_Hud']"
-                >
-                    Bass Synth
+        <span class="text-[10px] text-gray-900 p-2 font-['8_Bit_Hud']"
+            >Type a word or press play to generate a random seed</span
+        >
+        <div
+            class="ml-16 mr-16 mt-2 border-4 bg-slate-50/80 rounded-md border-neutral-800 divide-slate-400 divide-x-2 divide-y-2 shadow grid grid-cols-5"
+        >
+            <div>
+                <p class="menuTitle">Tempo</p>
+                <input @change="changeTempo" v-model="tempo" type="range" min="60" max="150" />
+                <span> {{ tempo }} BPM</span>
+            </div>
+            <div class="flex items-center justify-center relative" :class="{ 'bg-gray-400/80': !enable1 }">
+                <input v-model="enable1" class="absolute m-1 top-0 left-0" type="checkbox" />
+                <div>
+                    <p class="menuTitle">Root</p>
+                    <select v-model="context.root" :disabled="!enable1" class="m-1">
+                        <option value="">Rnd</option>
+                        <template v-for="(rootNote, index) in rootNotes" :key="index">
+                            <option :value="rootNote">{{ rootNote }}</option>
+                        </template>
+                    </select>
+                </div>
+                <div>
+                    <p class="menuTitle">Octave</p>
+                    <select v-model="context.octave" :disabled="!enable1" class="m-1">
+                        <option value="">Rnd</option>
+                        <option :value="0">0</option>
+                        <option :value="1">1</option>
+                        <option :value="2">2</option>
+                        <option :value="3">3</option>
+                    </select>
                 </div>
             </div>
+            <div class="relative" :class="{ 'bg-gray-400/80': !enable2 }">
+                <input v-model="enable2" class="absolute m-1 top-0 left-0" type="checkbox" />
+                <p class="menuTitle">Progression</p>
+                <select v-model="context.progression[0]" :disabled="!enable2" class="m-1">
+                    <option value="">Rnd</option>
+                    <template v-for="(chord, index) in chords" :key="index">
+                        <option :value="chord">{{ chord }}</option>
+                    </template>
+                </select>
+                <select v-model="context.progression[1]" :disabled="!enable2" class="m-1">
+                    <option value="">Rnd</option>
+                    <template v-for="(chord, index) in chords" :key="index">
+                        <option :value="chord">{{ chord }}</option>
+                    </template>
+                </select>
+                <select v-model="context.progression[2]" :disabled="!enable2" class="m-1">
+                    <option value="">Rnd</option>
+                    <template v-for="(chord, index) in chords" :key="index">
+                        <option :value="chord">{{ chord }}</option>
+                    </template>
+                </select>
+                <select v-model="context.progression[3]" :disabled="!enable2" class="m-1">
+                    <option value="">Rnd</option>
+                    <template v-for="(chord, index) in chords" :key="index">
+                        <option :value="chord">{{ chord }}</option>
+                    </template>
+                </select>
+            </div>
+        </div>
+        <div
+            class="ml-16 mr-16 mt-2 border-4 bg-slate-50/80 rounded-md border-neutral-800 divide-slate-400 divide-x-2 divide-y-2 shadow grid grid-cols-5"
+        >
             <div class="col-span-1 p-1">
-                <div
-                    class="text-[10px] mt-2 text-black mb-2 font-['8_Bit_Hud']"
-                >
-                    Synth 1
-                </div>
+                <div class="text-[10px] mt-2 text-black mb-1 font-['8_Bit_Hud']">Bass Synth</div>
             </div>
             <div class="col-span-1 p-1">
-                <div
-                    class="text-[10px] mt-2 text-black mb-2 font-['8_Bit_Hud']"
-                >
-                    Synth 2
-                </div>
+                <div class="text-[10px] mt-2 text-black mb-2 font-['8_Bit_Hud']">Synth 1</div>
             </div>
             <div class="col-span-1 p-1">
-                <div
-                    class="text-[10px] mt-2 text-black mb-2 font-['8_Bit_Hud']"
-                >
-                    Synth 3
-                </div>
+                <div class="text-[10px] mt-2 text-black mb-2 font-['8_Bit_Hud']">Synth 2</div>
             </div>
             <div class="col-span-1 p-1">
-                <div
-                    class="text-[10px] mt-2 text-black mb-2 font-['8_Bit_Hud']"
-                >
-                    Drums
-                </div>
+                <div class="text-[10px] mt-2 text-black mb-2 font-['8_Bit_Hud']">Synth 3</div>
+            </div>
+            <div class="col-span-1 p-1">
+                <div class="text-[10px] mt-2 text-black mb-2 font-['8_Bit_Hud']">Drums</div>
             </div>
             <div class="col-span-1">
                 <div
@@ -101,11 +177,10 @@
 import HelloWorld from "@/components/HelloWorld.vue";
 import * as Tone from "tone";
 import * as TotalSerialism from "total-serialism";
-import { OmniOscillator } from "tone";
 
 const reverb = new Tone.Reverb().toDestination();
 const vibrato = new Tone.Vibrato({
-    frequency: 10,
+    frequency: 5,
     depth: 0.2,
 }).toDestination();
 
@@ -218,22 +293,13 @@ const synth2 = new Tone.MonoSynth({
 
 const synth3 = new Tone.Synth({
     oscillator: {
-        type: "pwm",
+        type: "square",
     },
-    portamento: 0.02,
     envelope: {
-        attack: 0.001,
-        attackCurve: "linear",
-        decay: 0.001,
-        decayCurve: "exponential",
-        sustain: 1,
-        release: 0.5,
-        releaseCurve: "exponential",
+        release: 0.07,
     },
-    volume: -28,
-})
-    .toDestination()
-    .connect(vibrato);
+    volume: -20,
+}).toDestination();
 
 const bassSynth = new Tone.MonoSynth({
     oscillator: {
@@ -286,15 +352,19 @@ const SCALES = {
 
 const PROGRESSIONS = [
     ["IV", "V", "III", "VI"],
-    ["IVmaj7", "III7", "II7", "Imaj7"]
+    ["IVmaj7", "III7", "II7", "Imaj7"],
+    ["Imin", "VI", "III", "IVmin"],
 ];
 
 const PROGRESSIONSCALES = [
-    [SCALES["MIXOLYDIAN"], SCALES["MIXOLYDIAN"], SCALES["MIXOLYDIAN"], SCALES["MIXOLYDIAN"]],
-    [SCALES["MIXOLYDIAN"], SCALES["MIXOLYDIAN"], SCALES["MIXOLYDIAN"], SCALES["MIXOLYDIAN"]],
-    ];
+    [SCALES["MAJOR"], SCALES["MAJOR"], SCALES["MAJOR"], SCALES["MAJOR"]],
+    [SCALES["MAJOR"], SCALES["MAJOR"], SCALES["MAJOR"], SCALES["MAJOR"]],
+    [SCALES["MINOR"], SCALES["MAJOR"], SCALES["MAJOR"], SCALES["MINOR"]],
+];
 
 const FIFTHS = [60, 67, 62, 69, 64, 71, 66, 61, 68, 63, 70, 65];
+
+const CHORDS = ["IV", "V", "III", "VI"];
 
 let bassNotes,
     synth1Notes,
@@ -357,7 +427,7 @@ function fillDrums() {
     kickPart.clear();
     hhPart.clear();
     snarePart.clear();
-    if (1){ //Rand.coin(1)[0]) {
+    if (Rand.random(1, 1, 4)[0] != 1) {
         for (let i = 0; i < 128; i++) {
             if (i % 8 == 0 || i == 0) {
                 kickPattern.push({ time: time, note: 20, velocity: 1 });
@@ -429,7 +499,7 @@ function generateBassMelody() {
     let bassPattern = Rand.random(1, 0, 1)[0];
     let note;
 
-    if (1){ //Rand.coin(1)[0]) {
+    if (Rand.random(1, 1, 10)[0] != 1) {
         if (bassPattern == 0) {
             //euclidean
             for (let i = 0; i < 4; i++) {
@@ -479,7 +549,7 @@ function generateSynthMelody() {
 
     let note = 0;
 
-    if (1){ //Rand.coin(1)[0]) {
+    if (Rand.random(1, 1, 5)[0] != 1) {
         for (let i = 0; i < 4; i++) {
             for (let j = 0; j < 32; j++) {
                 note =
@@ -514,7 +584,7 @@ function generateSynth2Melody() {
     let auxIndex = 0;
     let note;
 
-    if (1){ //Rand.coin(1)[0]) {
+    if (Rand.random(1, 1, 5)[0] != 1) {
         //euclidean
         for (let i = 0; i < 4; i++) {
             for (let j = 0; j < 32; j++) {
@@ -553,7 +623,7 @@ function generateSynth3Melody() {
     let note;
     let gen = cAutomaton.next();
 
-    if (1){ //Rand.coin(1)[0]) {
+    if (Rand.random(1, 1, 8)[0] != 1) {
         for (let i = 0; i < 4; i++) {
             for (let j = 0; j < 32; j++) {
                 if (j == 0) {
@@ -613,8 +683,6 @@ function setup() {
     snarePart.loop = true;
     snarePart.loopStart = 0;
     snarePart.loopEnd = "8m";
-    fifthIndex = Rand.random(1, 0, FIFTHS.length);
-    root = FIFTHS[fifthIndex];
 }
 
 function setRoot() {
@@ -638,9 +706,8 @@ function setRoot() {
     synthRoot = root;
     bassRoot = root - 36;
 
-    progressionIndex = Rand.random(1, 0, PROGRESSIONS.length)
+    progressionIndex = Rand.random(1, 0, PROGRESSIONS.length);
     currentChords = TL.chordsFromNumerals(PROGRESSIONS[progressionIndex]);
-    console.log(currentChords)
 }
 
 function fillDisplayNotes(notes) {
@@ -675,19 +742,35 @@ export default {
             chords: null,
             modulationFrequency: 2,
             textSeed: "",
-            playing: 0,
+            playing: false,
+            paused: false,
+            root: 0,
+            chords: CHORDS,
+            enable1: false,
+            enable2: false,
+            context: {
+                progression: {
+                    0: "",
+                    1: "",
+                    2: "",
+                    3: "",
+                },
+                root: "",
+                octave: "",
+            },
+            rootNotes: ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"],
         };
     },
     created() {
         setup();
     },
     mounted() {
-        for(let i = 0 ; i < 128 ; i++){
-            this.bassNotes[i] = "-"
-            this.synth1Notes[i] = "-"
-            this.synth2Notes[i] = "-"
-            this.synth3Notes[i] = "-"
-            this.drumNotes[i] = "-"
+        for (let i = 0; i < 128; i++) {
+            this.bassNotes[i] = "-";
+            this.synth1Notes[i] = "-";
+            this.synth2Notes[i] = "-";
+            this.synth3Notes[i] = "-";
+            this.drumNotes[i] = "-";
         }
     },
     methods: {
@@ -705,14 +788,17 @@ export default {
         },
         startPlaying() {
             if (!this.playing) {
-                this.playing = 1;
+                this.playing = true;
 
                 if (this.textSeed == "") {
-                    this.textSeed = this.generateText()
-                } 
+                    this.textSeed = this.generateText();
+                }
 
                 Rand.seed(this.stringHash(this.textSeed));
 
+                fifthIndex = Rand.random(1, 0, FIFTHS.length)[0];
+                root = FIFTHS[fifthIndex];
+        
                 // feed with 40 randomly generated values 0-1
                 cAutomaton.feed(Rand.coin(128));
                 cAutomaton.rule(Rand.random(1, 1, 200)[0]);
@@ -729,10 +815,32 @@ export default {
                 Tone.Transport.start("+0.1");
             }
         },
-        stopPlaying() {
-            if (Tone.Transport.state == "started") {
-                Tone.Transport.stop();
+        resetPlaying() {
+            if (this.playing) {
+                this.playing = false;
+                this.paused = false;
+                this.progressTick = 0;
                 Tone.Transport.cancel(0);
+                Tone.Transport.stop();
+                for (let i = 0; i < 128; i++) {
+                    this.bassNotes[i] = "-";
+                    this.synth1Notes[i] = "-";
+                    this.synth2Notes[i] = "-";
+                    this.synth3Notes[i] = "-";
+                    this.drumNotes[i] = "-";
+                }
+            }
+        },
+        stopPlaying() {
+            if (this.playing) {
+                this.paused = true;
+                Tone.Transport.pause();
+            }
+        },
+        resumePlaying() {
+            if (this.paused) {
+                this.paused = false;
+                Tone.Transport.toggle();
             }
         },
         stringHash(str) {
@@ -763,6 +871,9 @@ export default {
             this.synth3Notes = fillDisplayNotes(synth3Notes);
             this.drumNotes = drumNotes;
         },
+        changeTempo() {
+            Tone.Transport.bpm.rampTo(this.tempo, 0.001);
+        },
         progressDisplay() {
             this.progressTick == 128 ? (this.progressTick = 0) : (this.progressTick = this.progressTick + 1);
         },
@@ -773,15 +884,7 @@ export default {
 };
 </script>
 <style scoped>
-
-.fontStroke{
-    -webkit-text-stroke: 4px black;
+.menuTitle {
+    font-family: "Karma";
 }
-
-.playText{
-    -webkit-text-stroke: 2px black;
-    text-shadow: 1px 5px 1px black;
-    font-weight: bold;
-}
-
 </style>

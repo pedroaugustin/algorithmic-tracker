@@ -27,7 +27,6 @@ nav {
 }
 
 nav a {
-    font-weight: bold;
     color: #000000;
 }
 
@@ -50,7 +49,7 @@ nav a.router-link-exact-active {
     src: url("~@/assets/fonts/8-bit Arcade In.ttf");
 }
 
-.appTitle{
+/* .appTitle{
     -webkit-text-stroke: 4px black;
     text-shadow: 1px 9px 1px black;
     font-weight: bold;
@@ -60,9 +59,9 @@ nav a.router-link-exact-active {
     -webkit-text-stroke: 1px black;
     text-shadow: 1px 3px 1px black;
     font-weight: bold;
-}
+} */
 
 .appBackground {
-background-color: #ffba01;
+background-color: #000000b0;
 }
 </style>
