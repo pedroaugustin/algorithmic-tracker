@@ -65,10 +65,11 @@
                     <p class="menuTitle">Octave</p>
                     <select v-model="context.octave" :disabled="!enable1" class="m-1">
                         <option value="">Rnd</option>
-                        <option :value="0">0</option>
                         <option :value="1">1</option>
                         <option :value="2">2</option>
                         <option :value="3">3</option>
+                        <option :value="4">4</option>
+                        <option :value="5">5</option>
                     </select>
                 </div>
             </div>
@@ -77,26 +78,54 @@
                 <p class="menuTitle">Progression</p>
                 <select v-model="context.progression[0]" :disabled="!enable2" class="m-1">
                     <option value="">Rnd</option>
-                    <template v-for="(chord, index) in chords" :key="index">
+                    <template v-for="(chord, index) in progressionChords" :key="index">
                         <option :value="chord">{{ chord }}</option>
                     </template>
                 </select>
                 <select v-model="context.progression[1]" :disabled="!enable2" class="m-1">
                     <option value="">Rnd</option>
-                    <template v-for="(chord, index) in chords" :key="index">
+                    <template v-for="(chord, index) in progressionChords" :key="index">
                         <option :value="chord">{{ chord }}</option>
                     </template>
                 </select>
                 <select v-model="context.progression[2]" :disabled="!enable2" class="m-1">
                     <option value="">Rnd</option>
-                    <template v-for="(chord, index) in chords" :key="index">
+                    <template v-for="(chord, index) in progressionChords" :key="index">
                         <option :value="chord">{{ chord }}</option>
                     </template>
                 </select>
                 <select v-model="context.progression[3]" :disabled="!enable2" class="m-1">
                     <option value="">Rnd</option>
-                    <template v-for="(chord, index) in chords" :key="index">
+                    <template v-for="(chord, index) in progressionChords" :key="index">
                         <option :value="chord">{{ chord }}</option>
+                    </template>
+                </select>
+            </div>
+            <div class="relative" :class="{ 'bg-gray-400/80': !enable3 }">
+                <input v-model="enable3" class="absolute m-1 top-0 left-0" type="checkbox" />
+                <p class="menuTitle">Scales</p>
+                <select v-model="context.scale[0]" :disabled="!enable3" class="m-1">
+                    <option value="">Rnd</option>
+                    <template v-for="(scale, index) in scales" :key="index">
+                        <option :value="scale">{{ scale }}</option>
+                    </template>
+                </select>
+                <select v-model="context.scale[1]" :disabled="!enable3" class="m-1">
+                    <option value="">Rnd</option>
+                    <template v-for="(scale, index) in scales" :key="index">
+                        <option :value="scale">{{ scale }}</option>
+                    </template>
+                </select>
+                <select v-model="context.scale[2]" :disabled="!enable3" class="m-1">
+                    <option value="">Rnd</option>
+                    <template v-for="(scale, index) in scales" :key="index">
+                        <option :value="scale">{{ scale }}</option>
+                    </template>
+                </select>
+                <select v-model="context.scale[3]" :disabled="!enable3" class="m-1">
+                    <option value="">Rnd</option>
+                    <template v-for="(scale, index) in scales" :key="index">
+                        <option :value="scale">{{ scale }}</option>
                     </template>
                 </select>
             </div>
@@ -357,14 +386,10 @@ const PROGRESSIONS = [
 ];
 
 const PROGRESSIONSCALES = [
-    [SCALES["MAJOR"], SCALES["MAJOR"], SCALES["MAJOR"], SCALES["MAJOR"]],
-    [SCALES["MAJOR"], SCALES["MAJOR"], SCALES["MAJOR"], SCALES["MAJOR"]],
-    [SCALES["MINOR"], SCALES["MAJOR"], SCALES["MAJOR"], SCALES["MINOR"]],
+    ["MAJOR", "MAJOR", "MAJOR", "MAJOR"],
+    ["MAJOR", "MAJOR", "MAJOR", "MAJOR"],
+    ["MINOR", "MAJOR", "MAJOR", "MINOR"],
 ];
-
-const FIFTHS = [60, 67, 62, 69, 64, 71, 66, 61, 68, 63, 70, 65];
-
-const CHORDS = ["IV", "V", "III", "VI"];
 
 let bassNotes,
     synth1Notes,
@@ -379,7 +404,7 @@ let bassNotes,
     synth2Melody,
     synth3Melody = [];
 let currentChords = [];
-let fifthIndex = 0;
+let currentScales = [];
 let root = 0;
 let synthRoot = root;
 let bassRoot = root - 24;
@@ -427,7 +452,7 @@ function fillDrums() {
     kickPart.clear();
     hhPart.clear();
     snarePart.clear();
-    if (Rand.random(1, 1, 4)[0] != 1) {
+    if (true) {
         for (let i = 0; i < 128; i++) {
             if (i % 8 == 0 || i == 0) {
                 kickPattern.push({ time: time, note: 20, velocity: 1 });
@@ -499,7 +524,7 @@ function generateBassMelody() {
     let bassPattern = Rand.random(1, 0, 1)[0];
     let note;
 
-    if (Rand.random(1, 1, 10)[0] != 1) {
+    if (true) {
         if (bassPattern == 0) {
             //euclidean
             for (let i = 0; i < 4; i++) {
@@ -549,12 +574,11 @@ function generateSynthMelody() {
 
     let note = 0;
 
-    if (Rand.random(1, 1, 5)[0] != 1) {
+    if (true) {
         for (let i = 0; i < 4; i++) {
             for (let j = 0; j < 32; j++) {
                 note =
-                    synthRoot -
-                    12 +
+                    synthRoot +
                     currentChords[i][Rand.random(1, 0, currentChords[i].length)] +
                     Rand.choose(1, [0, 12, 24])[0];
                 synth1Notes.push(note);
@@ -584,16 +608,12 @@ function generateSynth2Melody() {
     let auxIndex = 0;
     let note;
 
-    if (Rand.random(1, 1, 5)[0] != 1) {
+    if (true) {
         //euclidean
         for (let i = 0; i < 4; i++) {
             for (let j = 0; j < 32; j++) {
                 note =
-                    (synthRoot +
-                        currentChords[i][0] +
-                        PROGRESSIONSCALES[progressionIndex][i][
-                            Rand.random(1, 0, PROGRESSIONSCALES[progressionIndex][i].length)
-                        ]) *
+                    (synthRoot + currentChords[i][0] + currentScales[i][Rand.random(1, 0, currentScales[i].length)]) *
                     euclid[auxIndex];
                 synth2Notes.push(note);
                 auxIndex++;
@@ -623,7 +643,7 @@ function generateSynth3Melody() {
     let note;
     let gen = cAutomaton.next();
 
-    if (Rand.random(1, 1, 8)[0] != 1) {
+    if (true) {
         for (let i = 0; i < 4; i++) {
             for (let j = 0; j < 32; j++) {
                 if (j == 0) {
@@ -632,9 +652,7 @@ function generateSynth3Melody() {
                     note =
                         (synthRoot +
                             currentChords[i][0] +
-                            PROGRESSIONSCALES[progressionIndex][i][
-                                Rand.random(1, 0, PROGRESSIONSCALES[progressionIndex][i].length)
-                            ]) *
+                            currentScales[i][Rand.random(1, 0, currentScales[i].length)]) *
                         gen[auxIndex];
                 }
 
@@ -685,37 +703,11 @@ function setup() {
     snarePart.loopEnd = "8m";
 }
 
-function setRoot() {
-    let upOrDown = Rand.random(1, 0, 1)[0];
-
-    if (upOrDown == 0) {
-        if (fifthIndex + 1 > FIFTHS.length) {
-            fifthIndex = 0;
-        } else {
-            fifthIndex = fifthIndex + 1;
-        }
-    } else {
-        if (fifthIndex - 1 < 0) {
-            fifthIndex = FIFTHS.length;
-        } else {
-            fifthIndex = fifthIndex - 1;
-        }
-    }
-
-    root = FIFTHS[fifthIndex];
-    synthRoot = root;
-    bassRoot = root - 36;
-
-    progressionIndex = Rand.random(1, 0, PROGRESSIONS.length);
-    currentChords = TL.chordsFromNumerals(PROGRESSIONS[progressionIndex]);
-}
-
 function fillDisplayNotes(notes) {
     return notes.map(item => (item == 0 ? "-" : TL.midiToNote(item)));
 }
 
 function generateNewPatterns() {
-    setRoot();
     generateBassMelody();
     generateSynthMelody();
     generateSynth2Melody();
@@ -745,9 +737,9 @@ export default {
             playing: false,
             paused: false,
             root: 0,
-            chords: CHORDS,
             enable1: false,
             enable2: false,
+            enable3: false,
             context: {
                 progression: {
                     0: "",
@@ -757,8 +749,85 @@ export default {
                 },
                 root: "",
                 octave: "",
+                scale: {
+                    0: "",
+                    1: "",
+                    2: "",
+                    3: "",
+                },
             },
             rootNotes: ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"],
+            scales: [
+                "MAJOR",
+                "MINOR",
+                "MELODIC_MINOR",
+                "DORIAN",
+                "PHRYGIAN",
+                "NATURAL_MAJOR",
+                "MIXOLYDIAN",
+                "LOCRIAN",
+                "NATURAL_MINOR",
+                "MAJOR_PENTATONIC",
+                "MINOR_PENTATONIC",
+            ],
+            progressionChords: [
+                "IM",
+                "IIM",
+                "IIIM",
+                "IVM",
+                "VM",
+                "VIM",
+                "VIIM",
+                "Im",
+                "IIm",
+                "IIIm",
+                "IVm",
+                "Vm",
+                "VIm",
+                "VIIm",
+                "Imaj7",
+                "IImaj7",
+                "IIImaj7",
+                "IVmaj7",
+                "Vmaj7",
+                "VImaj7",
+                "VIImaj7",
+                "Im7",
+                "IIm7",
+                "IIIm7",
+                "IVm7",
+                "Vm7",
+                "VIm7",
+                "VIIm7",
+                "Isus2",
+                "IIsus2",
+                "IIIsus2",
+                "IVsus2",
+                "Vsus2",
+                "VIsus2",
+                "VIIsus2",
+                "Isus4",
+                "IIsus4",
+                "IIIsus4",
+                "IVsus4",
+                "Vsus4",
+                "VIsus4",
+                "VIIsus4",
+                "Imaj9",
+                "IImaj9",
+                "IIImaj9",
+                "IVmaj9",
+                "Vmaj9",
+                "VImaj9",
+                "VIImaj9",
+                "Im9",
+                "IIm9",
+                "IIIm9",
+                "IVm9",
+                "Vm9",
+                "VIm9",
+                "VIIm9",
+            ],
         };
     },
     created() {
@@ -796,9 +865,9 @@ export default {
 
                 Rand.seed(this.stringHash(this.textSeed));
 
-                fifthIndex = Rand.random(1, 0, FIFTHS.length)[0];
-                root = FIFTHS[fifthIndex];
-        
+                let rootString = this.chooseRoot();
+                root = TL.noteToMidi(rootString);
+
                 // feed with 40 randomly generated values 0-1
                 cAutomaton.feed(Rand.coin(128));
                 cAutomaton.rule(Rand.random(1, 1, 200)[0]);
@@ -806,6 +875,7 @@ export default {
                 Tone.start();
                 Tone.Transport.bpm.rampTo(this.tempo, 0.001);
                 Tone.Transport.scheduleRepeat(time => {
+                    this.setRoot();
                     generateNewPatterns();
                     this.changeNotes();
                 }, "16m");
@@ -879,6 +949,76 @@ export default {
         },
         setModulation() {
             synth3.oscillator.modulationFrequency.value = this.modulationFrequency;
+        },
+        chooseRoot() {
+            let rootString = "";
+
+            if (this.enable1) {
+                if (this.context.root == "") {
+                    rootString = rootString.concat(this.rootNotes[Rand.random(1, 0, this.rootNotes.length)[0]]);
+                } else {
+                    rootString = rootString.concat(this.context.root);
+                }
+            } else {
+                rootString = rootString.concat(this.rootNotes[Rand.random(1, 0, this.rootNotes.length)[0]]);
+            }
+
+            rootString = rootString.concat("1");
+
+            return rootString;
+        },
+        setRoot() {
+            let upOrDown = Rand.random(1, 0, 1)[0];
+
+            if (this.context.root != "") {
+                if (upOrDown == 0) {
+                    root = (root + 7) % 12;
+                } else {
+                    root = (root + 5) % 12;
+                }
+            } else {
+                root = root % 12;
+            }
+
+            if (this.enable1 && this.context.octave != "") {
+                root = root + 12 * parseInt(this.context.octave);
+            } else {
+                root = root + Rand.choose(1, [36, 48, 60, 72])[0];
+            }
+
+            synthRoot = root;
+
+            bassRoot = (root % 12) + Rand.choose(1, [24, 36, 48])[0];
+
+            if (this.enable2) {
+                let chords = [];
+                for (let i = 0; i < 4; i++) {
+                    if (this.context.progression[i] != "") {
+                        chords[i] = this.context.progression[i];
+                    } else {
+                        chords[i] = Rand.choose(1, this.progressionChords);
+                    }
+                }
+
+                currentChords = TL.chordsFromNumerals(chords);
+            } else {
+                progressionIndex = Rand.random(1, 0, PROGRESSIONS.length);
+                currentChords = TL.chordsFromNumerals(PROGRESSIONS[progressionIndex]);
+            }
+
+            if (this.enable3) {
+                for (let i = 0; i < 4; i++) {
+                    if (this.context.scale[i] != "") {
+                        currentScales[i] = SCALES[this.context.scale[i]];
+                    } else {
+                        currentScales[i] = SCALES[Rand.choose(1, this.scales)];
+                    }
+                }
+            } else {
+                for (let i = 0; i < 4; i++) {
+                    currentScales[i] = SCALES[PROGRESSIONSCALES[progressionIndex][i]];
+                }
+            }
         },
     },
 };
