@@ -39,9 +39,7 @@
                 </p>
             </div>
         </div>
-        <span class="text-[10px] text-gray-900 p-2 font-['8_Bit_Hud']"
-            >Type a word or press play to generate a random seed</span
-        >
+        <span class="text-[10px] text-gray-900 p-2 font-['8_Bit_Hud']">Type a word or press play to generate a random seed</span>
         <div
             class="ml-16 mr-16 mt-2 border-4 bg-slate-50/80 rounded-md border-neutral-800 divide-slate-400 divide-x-2 divide-y-2 shadow grid grid-cols-5"
         >
@@ -135,18 +133,33 @@
         >
             <div class="col-span-1 p-1">
                 <div class="text-[10px] mt-2 text-black mb-1 font-['8_Bit_Hud']">Bass Synth</div>
+                <div>
+                    <input @change="setBassOptions" class="w-full" v-model="bassVolume" type="range" min="-60" max="0" />
+                </div>
             </div>
             <div class="col-span-1 p-1">
                 <div class="text-[10px] mt-2 text-black mb-2 font-['8_Bit_Hud']">Synth 1</div>
+                <div>
+                    <input @change="setSynth1Options" class="w-full" v-model="synthVolume" type="range" min="-60" max="0" />
+                </div>
             </div>
             <div class="col-span-1 p-1">
                 <div class="text-[10px] mt-2 text-black mb-2 font-['8_Bit_Hud']">Synth 2</div>
+                <div>
+                    <input @change="setSynth2Options" class="w-full" v-model="synth2Volume" type="range" min="-60" max="0" />
+                </div>
             </div>
             <div class="col-span-1 p-1">
                 <div class="text-[10px] mt-2 text-black mb-2 font-['8_Bit_Hud']">Synth 3</div>
+                <div>
+                    <input @change="setSynth3Options" class="w-full" v-model="synth3Volume" type="range" min="-60" max="0" />
+                </div>
             </div>
             <div class="col-span-1 p-1">
                 <div class="text-[10px] mt-2 text-black mb-2 font-['8_Bit_Hud']">Drums</div>
+                <div>
+                    <input @change="setDrumsOptions" class="w-full" v-model="drumsVolume" type="range" min="-60" max="0" />
+                </div>
             </div>
             <div class="col-span-1">
                 <div
@@ -206,12 +219,14 @@
 import HelloWorld from "@/components/HelloWorld.vue";
 import * as Tone from "tone";
 import * as TotalSerialism from "total-serialism";
+import { BitCrusher } from 'tone';
 
 const reverb = new Tone.Reverb().toDestination();
 const vibrato = new Tone.Vibrato({
     frequency: 5,
     depth: 0.2,
 }).toDestination();
+const crusher = new Tone.BitCrusher(16).toDestination();
 
 const Rand = TotalSerialism.Stochastic;
 const TL = TotalSerialism.Translate;
@@ -224,7 +239,7 @@ const hihatSynth = new Tone.NoiseSynth({
         sustain: 0.8,
         release: 0.001,
     },
-    volume: -20,
+    volume: -90,
 }).toDestination();
 
 const kickSynth = new Tone.MembraneSynth({
@@ -239,7 +254,7 @@ const kickSynth = new Tone.MembraneSynth({
         sustain: 1,
         release: 0.001,
     },
-    volume: -18,
+    volume: -90,
 }).toDestination();
 
 const snareSynth = new Tone.NoiseSynth({
@@ -249,41 +264,15 @@ const snareSynth = new Tone.NoiseSynth({
         sustain: 1,
         release: 0.15,
     },
-    volume: -24,
+    volume: -90,
 }).toDestination();
 
-const synth = new Tone.MonoSynth({
+const synth = new Tone.Synth({
     oscillator: {
-        frequency: 440,
-        type: "sawtooth",
+        type: "pwm",
+        modulationFrequency: 1,
     },
-    envelope: {
-        attack: 0.001,
-        attackCurve: "linear",
-        decay: 0.001,
-        decayCurve: "exponential",
-        sustain: 1,
-        release: 0.1,
-        releaseCurve: "exponential",
-    },
-    filter: {
-        Q: 1,
-        rollof: -12,
-        type: "lowpass",
-    },
-    filterEnvelope: {
-        attack: 0.001,
-        attackCurve: "linear",
-        baseFrequency: 400,
-        decay: 0.01,
-        decayCurve: "exponential",
-        exponent: 2,
-        octaves: 4,
-        sustain: 1,
-        release: 0.8,
-        releaseCurve: "exponential",
-    },
-    volume: -25,
+    volume: -90,
 }).toDestination();
 
 const synth2 = new Tone.MonoSynth({
@@ -317,7 +306,7 @@ const synth2 = new Tone.MonoSynth({
         release: 0.8,
         releaseCurve: "exponential",
     },
-    volume: -30,
+    volume: -90,
 }).toDestination();
 
 const synth3 = new Tone.Synth({
@@ -327,42 +316,21 @@ const synth3 = new Tone.Synth({
     envelope: {
         release: 0.07,
     },
-    volume: -20,
+    volume: -90,
 }).toDestination();
 
-const bassSynth = new Tone.MonoSynth({
+const bassSynth = new Tone.Synth({
     oscillator: {
-        frequency: 440,
-        type: "sawtooth",
+        type: "triangle3",
     },
     envelope: {
         attack: 0.001,
-        attackCurve: "linear",
-        decay: 0.001,
-        decayCurve: "exponential",
-        sustain: 1,
-        release: 0.06,
-        releaseCurve: "exponential",
+        release: 0.01,
+        decay: 0.3,
+        sustain: 0.001,
     },
-    filter: {
-        Q: 1,
-        rollof: -12,
-        type: "lowpass",
-    },
-    filterEnvelope: {
-        attack: 0.001,
-        attackCurve: "linear",
-        baseFrequency: 400,
-        decay: 0.01,
-        decayCurve: "exponential",
-        exponent: 2,
-        octaves: 4,
-        sustain: 1,
-        release: 0.8,
-        releaseCurve: "exponential",
-    },
-    volume: -20,
-}).toDestination();
+    volume: -2,
+}).toDestination().connect(crusher);
 
 // Scales
 const SCALES = {
@@ -381,14 +349,10 @@ const SCALES = {
 
 const PROGRESSIONS = [
     ["IV", "V", "III", "VI"],
-    ["IVmaj7", "III7", "II7", "Imaj7"],
-    ["Imin", "VI", "III", "IVmin"],
 ];
 
 const PROGRESSIONSCALES = [
-    ["MAJOR", "MAJOR", "MAJOR", "MAJOR"],
-    ["MAJOR", "MAJOR", "MAJOR", "MAJOR"],
-    ["MINOR", "MAJOR", "MAJOR", "MINOR"],
+    ["MAJOR_PENTATONIC", "MAJOR_PENTATONIC", "MAJOR_PENTATONIC", "MAJOR_PENTATONIC"],
 ];
 
 let bassNotes,
@@ -408,7 +372,7 @@ let currentScales = [];
 let root = 0;
 let synthRoot = root;
 let bassRoot = root - 24;
-let bpm = 130;
+let bpm = 120;
 let progressionIndex = 0;
 let cAutomaton = new Algo.Automaton();
 
@@ -503,7 +467,7 @@ function fillMelodyArray(melody) {
         if (melody[i] != 0) {
             melodyArray.push({
                 time: time,
-                duration: i % 2 == 0 ? "4n" : "32n",
+                duration: "32n",
                 note: Tone.Frequency(melody[i], "midi").toFrequency(),
                 velocity: 1,
             });
@@ -577,10 +541,7 @@ function generateSynthMelody() {
     if (true) {
         for (let i = 0; i < 4; i++) {
             for (let j = 0; j < 32; j++) {
-                note =
-                    synthRoot +
-                    currentChords[i][Rand.random(1, 0, currentChords[i].length)] +
-                    Rand.choose(1, [0, 12, 24])[0];
+                note = synthRoot + currentChords[i][Rand.random(1, 0, currentChords[i].length)] + Rand.choose(1, [0, 12, 24])[0];
                 synth1Notes.push(note);
             }
         }
@@ -612,9 +573,7 @@ function generateSynth2Melody() {
         //euclidean
         for (let i = 0; i < 4; i++) {
             for (let j = 0; j < 32; j++) {
-                note =
-                    (synthRoot + currentChords[i][0] + currentScales[i][Rand.random(1, 0, currentScales[i].length)]) *
-                    euclid[auxIndex];
+                note = (synthRoot + currentChords[i][0] + currentScales[i][Rand.random(1, 0, currentScales[i].length)]) * euclid[auxIndex];
                 synth2Notes.push(note);
                 auxIndex++;
             }
@@ -649,11 +608,7 @@ function generateSynth3Melody() {
                 if (j == 0) {
                     note = synthRoot + currentChords[i][0];
                 } else {
-                    note =
-                        (synthRoot +
-                            currentChords[i][0] +
-                            currentScales[i][Rand.random(1, 0, currentScales[i].length)]) *
-                        gen[auxIndex];
+                    note = (synthRoot + currentChords[i][0] + currentScales[i][Rand.random(1, 0, currentScales[i].length)]) * gen[auxIndex];
                 }
 
                 synth3Notes.push(note);
@@ -704,7 +659,7 @@ function setup() {
 }
 
 function fillDisplayNotes(notes) {
-    return notes.map(item => (item == 0 ? "-" : TL.midiToNote(item)));
+    return notes.map(item => (item == 0 ? "---" : TL.midiToNote(item)));
 }
 
 function generateNewPatterns() {
@@ -724,6 +679,11 @@ export default {
     data() {
         return {
             tempo: bpm,
+            bassVolume: -25,
+            synthVolume: -30,
+            synth2Volume: -20,
+            synth3Volume: -20,
+            drumsVolume: -20,
             bassNotes: {},
             synth1Notes: {},
             synth2Notes: {},
@@ -835,11 +795,11 @@ export default {
     },
     mounted() {
         for (let i = 0; i < 128; i++) {
-            this.bassNotes[i] = "-";
-            this.synth1Notes[i] = "-";
-            this.synth2Notes[i] = "-";
-            this.synth3Notes[i] = "-";
-            this.drumNotes[i] = "-";
+            this.bassNotes[i] = "---";
+            this.synth1Notes[i] = "---";
+            this.synth2Notes[i] = "---";
+            this.synth3Notes[i] = "---";
+            this.drumNotes[i] = "---";
         }
     },
     methods: {
@@ -893,11 +853,11 @@ export default {
                 Tone.Transport.cancel(0);
                 Tone.Transport.stop();
                 for (let i = 0; i < 128; i++) {
-                    this.bassNotes[i] = "-";
-                    this.synth1Notes[i] = "-";
-                    this.synth2Notes[i] = "-";
-                    this.synth3Notes[i] = "-";
-                    this.drumNotes[i] = "-";
+                    this.bassNotes[i] = "---";
+                    this.synth1Notes[i] = "---";
+                    this.synth2Notes[i] = "---";
+                    this.synth3Notes[i] = "---";
+                    this.drumNotes[i] = "---";
                 }
             }
         },
@@ -947,8 +907,20 @@ export default {
         progressDisplay() {
             this.progressTick == 128 ? (this.progressTick = 0) : (this.progressTick = this.progressTick + 1);
         },
-        setModulation() {
-            synth3.oscillator.modulationFrequency.value = this.modulationFrequency;
+        setBassOptions() {
+            bassSynth.set({volume:this.bassVolume})
+        },
+        setSynth1Options() {
+            synth.set({volume:this.synthVolume})
+        },
+        setSynth2Options() {
+            synth2.set({volume:this.synth2Volume})
+        },
+        setSynth3Options() {
+            synth3.set({volume:this.synth3Volume})
+        },
+        setDrumsOptions() {
+            bassSynth.set({volume:this.bassVolume})
         },
         chooseRoot() {
             let rootString = "";
@@ -983,12 +955,12 @@ export default {
             if (this.enable1 && this.context.octave != "") {
                 root = root + 12 * parseInt(this.context.octave);
             } else {
-                root = root + Rand.choose(1, [36, 48, 60, 72])[0];
+                root = root + Rand.choose(1, [24, 36, 48, 60])[0];
             }
 
             synthRoot = root;
 
-            bassRoot = (root % 12) + Rand.choose(1, [24, 36, 48])[0];
+            bassRoot = (root % 12) + Rand.choose(1, [36])[0];
 
             if (this.enable2) {
                 let chords = [];
