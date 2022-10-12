@@ -3,46 +3,32 @@
         <div class="flex justify-center mb-2">
             <input
                 class="text-[20px] bg-slate-100 shadow w-[340px] h-12 border-2 p-2 border-black text-black rounded-md font-['Karma']"
-                v-model="textSeed"
-                type="text"
-                placeholder="Type Here"
-            />
+                v-model="textSeed" type="text" placeholder="Type Here" />
             <div class="h-12">
-                <p
-                    class="text-[50px] leading-10 text-white ml-2 font-['8_Bit_Arcade'] playText cursor-pointer hover:text-[#37d706]"
-                    @click="startPlaying()"
-                    v-if="!playing"
-                >
+                <p class="text-[50px] leading-10 text-white ml-2 font-['8_Bit_Arcade'] playText cursor-pointer hover:text-[#37d706]"
+                    @click="startPlaying()" v-if="!playing">
                     play
                 </p>
-                <p
-                    class="text-[50px] leading-10 text-white ml-2 font-['8_Bit_Arcade'] playText cursor-pointer hover:text-[#37d706]"
-                    @click="stopPlaying()"
-                    v-if="playing && !paused"
-                >
+                <p class="text-[50px] leading-10 text-white ml-2 font-['8_Bit_Arcade'] playText cursor-pointer hover:text-[#37d706]"
+                    @click="stopPlaying()" v-if="playing && !paused">
                     pause
                 </p>
-                <p
-                    class="text-[50px] leading-10 text-white ml-2 font-['8_Bit_Arcade'] playText cursor-pointer hover:text-[#37d706]"
-                    @click="resumePlaying()"
-                    v-if="paused"
-                >
+                <p class="text-[50px] leading-10 text-white ml-2 font-['8_Bit_Arcade'] playText cursor-pointer hover:text-[#37d706]"
+                    @click="resumePlaying()" v-if="paused">
                     resume
                 </p>
             </div>
             <div class="h-12">
-                <p
-                    class="text-[30px] leading-10 text-white ml-2 font-['8_Bit_Arcade'] playText cursor-pointer hover:text-[#37d706]"
-                    @click="resetPlaying()"
-                >
+                <p class="text-[30px] leading-10 text-white ml-2 font-['8_Bit_Arcade'] playText cursor-pointer hover:text-[#37d706]"
+                    @click="resetPlaying()">
                     reset
                 </p>
             </div>
         </div>
-        <span class="text-[10px] text-gray-900 p-2 font-['8_Bit_Hud']">Type a word or press play to generate a random seed</span>
+        <span class="text-[10px] text-slate-100 p-2 font-['8_Bit_Hud']">Type a word or press play to generate a random
+            seed</span>
         <div
-            class="ml-16 mr-16 mt-2 border-4 bg-slate-50/80 rounded-md border-neutral-800 divide-slate-400 divide-x-2 divide-y-2 shadow grid grid-cols-5"
-        >
+            class="ml-16 mr-16 mt-2 border-4 bg-slate-50/90 rounded-md border-neutral-800 divide-slate-400 divide-x-2 divide-y-2 shadow grid grid-cols-5">
             <div>
                 <p class="menuTitle">Tempo</p>
                 <input @change="changeTempo" v-model="tempo" type="range" min="60" max="150" />
@@ -71,147 +57,135 @@
                     </select>
                 </div>
             </div>
-            <div class="relative" :class="{ 'bg-gray-400/80': !enable2 }">
+            <div class="relative p-2" :class="{ 'bg-gray-400/80': !enable2 }">
                 <input v-model="enable2" class="absolute m-1 top-0 left-0" type="checkbox" />
                 <p class="menuTitle">Progression</p>
-                <select v-model="context.progression[0]" :disabled="!enable2" class="m-1">
+                <select v-model="context.progression[0]" :disabled="!enable2" class="m-1 w-1/2">
                     <option value="">Rnd</option>
                     <template v-for="(chord, index) in progressionChords" :key="index">
                         <option :value="chord">{{ chord }}</option>
                     </template>
                 </select>
-                <select v-model="context.progression[1]" :disabled="!enable2" class="m-1">
+                <select v-model="context.progression[1]" :disabled="!enable2" class="m-1 w-1/2">
                     <option value="">Rnd</option>
                     <template v-for="(chord, index) in progressionChords" :key="index">
                         <option :value="chord">{{ chord }}</option>
                     </template>
                 </select>
-                <select v-model="context.progression[2]" :disabled="!enable2" class="m-1">
+                <select v-model="context.progression[2]" :disabled="!enable2" class="m-1 w-1/2">
                     <option value="">Rnd</option>
                     <template v-for="(chord, index) in progressionChords" :key="index">
                         <option :value="chord">{{ chord }}</option>
                     </template>
                 </select>
-                <select v-model="context.progression[3]" :disabled="!enable2" class="m-1">
+                <select v-model="context.progression[3]" :disabled="!enable2" class="m-1 w-1/2">
                     <option value="">Rnd</option>
                     <template v-for="(chord, index) in progressionChords" :key="index">
                         <option :value="chord">{{ chord }}</option>
                     </template>
                 </select>
             </div>
-            <div class="relative" :class="{ 'bg-gray-400/80': !enable3 }">
+            <div class="relative p-2" :class="{ 'bg-gray-400/80': !enable3 }">
                 <input v-model="enable3" class="absolute m-1 top-0 left-0" type="checkbox" />
                 <p class="menuTitle">Scales</p>
-                <select v-model="context.scale[0]" :disabled="!enable3" class="m-1">
+                <select v-model="context.scale[0]" :disabled="!enable3" class="m-1 w-1/2">
                     <option value="">Rnd</option>
                     <template v-for="(scale, index) in scales" :key="index">
                         <option :value="scale">{{ scale }}</option>
                     </template>
                 </select>
-                <select v-model="context.scale[1]" :disabled="!enable3" class="m-1">
+                <select v-model="context.scale[1]" :disabled="!enable3" class="m-1 w-1/2">
                     <option value="">Rnd</option>
                     <template v-for="(scale, index) in scales" :key="index">
                         <option :value="scale">{{ scale }}</option>
                     </template>
                 </select>
-                <select v-model="context.scale[2]" :disabled="!enable3" class="m-1">
+                <select v-model="context.scale[2]" :disabled="!enable3" class="m-1 w-1/2">
                     <option value="">Rnd</option>
                     <template v-for="(scale, index) in scales" :key="index">
                         <option :value="scale">{{ scale }}</option>
                     </template>
                 </select>
-                <select v-model="context.scale[3]" :disabled="!enable3" class="m-1">
+                <select v-model="context.scale[3]" :disabled="!enable3" class="m-1 w-1/2">
                     <option value="">Rnd</option>
                     <template v-for="(scale, index) in scales" :key="index">
                         <option :value="scale">{{ scale }}</option>
                     </template>
                 </select>
+            </div>
+            <div class="relative p-2">
+                <p class="menuTitle">MIDI</p>
             </div>
         </div>
         <div
-            class="ml-16 mr-16 mt-2 border-4 bg-slate-50/80 rounded-md border-neutral-800 divide-slate-400 divide-x-2 divide-y-2 shadow grid grid-cols-5"
-        >
+            class="ml-16 mr-16 mt-2 border-4 bg-slate-50/90 rounded-md border-neutral-800 divide-slate-400 divide-x-2 divide-y-2 shadow grid grid-cols-5">
             <div class="col-span-1 p-1">
                 <div class="text-[10px] mt-2 text-black mb-1 font-['8_Bit_Hud']">Bass Synth</div>
                 <div>
                     <span class="text-[8px] text-black/75 font-['8_Bit_Hud']">{{ bassVolume }}</span>
-                    <input @change="setBassOptions" class="w-full" v-model="bassVolume" type="range" min="-60" max="-15" />
+                    <input @change="setBassOptions" class="w-full" v-model="bassVolume" type="range" min="-60"
+                        max="-10" />
                 </div>
             </div>
             <div class="col-span-1 p-1">
                 <div class="text-[10px] mt-2 text-black mb-2 font-['8_Bit_Hud']">Synth 1</div>
                 <div>
                     <span class="text-[8px] text-black/75 font-['8_Bit_Hud']">{{ synthVolume }}</span>
-                    <input @change="setSynth1Options" class="w-full" v-model="synthVolume" type="range" min="-60" max="-15" />
+                    <input @change="setSynth1Options" class="w-full" v-model="synthVolume" type="range" min="-60"
+                        max="-10" />
                 </div>
             </div>
             <div class="col-span-1 p-1">
                 <div class="text-[10px] mt-2 text-black mb-2 font-['8_Bit_Hud']">Synth 2</div>
                 <div>
                     <span class="text-[8px] text-black/75 font-['8_Bit_Hud']">{{ synth2Volume }}</span>
-                    <input @change="setSynth2Options" class="w-full" v-model="synth2Volume" type="range" min="-60" max="-15" />
+                    <input @change="setSynth2Options" class="w-full" v-model="synth2Volume" type="range" min="-60"
+                        max="-10" />
                 </div>
             </div>
             <div class="col-span-1 p-1">
                 <div class="text-[10px] mt-2 text-black mb-2 font-['8_Bit_Hud']">Synth 3</div>
                 <div>
                     <span class="text-[8px] text-black/75 font-['8_Bit_Hud']">{{ synth3Volume }}</span>
-                    <input @change="setSynth3Options" class="w-full" v-model="synth3Volume" type="range" min="-60" max="-15" />
+                    <input @change="setSynth3Options" class="w-full" v-model="synth3Volume" type="range" min="-60"
+                        max="-10" />
                 </div>
             </div>
             <div class="col-span-1 p-1">
                 <div class="text-[10px] mt-2 text-black mb-2 font-['8_Bit_Hud']">Drums</div>
                 <div>
-                    <input @change="setDrumsOptions" class="w-full" v-model="drumsVolume" type="range" min="-60" max="-15" />
+                    <span class="text-[8px] text-black/75 font-['8_Bit_Hud']">{{ drumsVolume }}</span>
+                    <input @change="setDrumsOptions" class="w-full" v-model="drumsVolume" type="range" min="-60"
+                        max="-10" />
                 </div>
             </div>
             <div class="col-span-1">
-                <div
-                    v-for="(note, index) in bassNotes"
-                    :key="index"
-                    class="text-[10px] text-black font-['8_Bit_Hud']"
-                    :class="{ 'bg-neutral-600 text-sky-50': index == progressTick }"
-                >
+                <div v-for="(note, index) in bassNotes" :key="index" class="text-[10px] text-black font-['8_Bit_Hud']"
+                    :class="{ 'bg-neutral-600 text-sky-50': index == progressTick }">
                     {{ note }}
                 </div>
             </div>
             <div class="col-span-1">
-                <div
-                    v-for="(note, index) in synth1Notes"
-                    :key="index"
-                    class="text-[10px] text-black font-['8_Bit_Hud']"
-                    :class="{ 'bg-neutral-600 text-sky-50': index == progressTick }"
-                >
+                <div v-for="(note, index) in synth1Notes" :key="index" class="text-[10px] text-black font-['8_Bit_Hud']"
+                    :class="{ 'bg-neutral-600 text-sky-50': index == progressTick }">
                     {{ note }}
                 </div>
             </div>
             <div class="col-span-1">
-                <div
-                    v-for="(note, index) in synth2Notes"
-                    :key="index"
-                    class="text-[10px] text-black font-['8_Bit_Hud']"
-                    :class="{ 'bg-neutral-600 text-sky-50': index == progressTick }"
-                >
+                <div v-for="(note, index) in synth2Notes" :key="index" class="text-[10px] text-black font-['8_Bit_Hud']"
+                    :class="{ 'bg-neutral-600 text-sky-50': index == progressTick }">
                     {{ note }}
                 </div>
             </div>
             <div class="col-span-1">
-                <div
-                    v-for="(note, index) in synth3Notes"
-                    :key="index"
-                    class="text-[10px] text-black font-['8_Bit_Hud']"
-                    :class="{ 'bg-neutral-600 text-sky-50': index == progressTick }"
-                >
+                <div v-for="(note, index) in synth3Notes" :key="index" class="text-[10px] text-black font-['8_Bit_Hud']"
+                    :class="{ 'bg-neutral-600 text-sky-50': index == progressTick }">
                     {{ note }}
                 </div>
             </div>
             <div class="col-span-1">
-                <div
-                    v-for="(note, index) in drumNotes"
-                    :key="index"
-                    class="text-[10px] text-black font-['8_Bit_Hud']"
-                    :class="{ 'bg-neutral-600 text-sky-50': index == progressTick }"
-                >
+                <div v-for="(note, index) in drumNotes" :key="index" class="text-[10px] text-black font-['8_Bit_Hud']"
+                    :class="{ 'bg-neutral-600 text-sky-50': index == progressTick }">
                     {{ note }}
                 </div>
             </div>
@@ -223,7 +197,8 @@
 import HelloWorld from "@/components/HelloWorld.vue";
 import * as Tone from "tone";
 import * as TotalSerialism from "total-serialism";
-import { BitCrusher } from 'tone';
+import { Midi } from '@tonejs/midi'
+import axios from 'axios'
 
 const reverb = new Tone.Reverb().toDestination();
 const feedbackDelay = new Tone.FeedbackDelay("32n", 0.6).toDestination();
@@ -259,7 +234,7 @@ const kickSynth = new Tone.MembraneSynth({
         sustain: 0,
         release: 0,
     },
-    volume: -17,
+    volume: -18,
 }).connect(crusher).toDestination();
 
 const snareSynth = new Tone.NoiseSynth({
@@ -273,93 +248,93 @@ const snareSynth = new Tone.NoiseSynth({
 }).connect(crusher).toDestination();
 
 const synth = new Tone.Synth({
-	volume: -35,
-	detune: 0,
-	portamento: 0,
-	envelope: {
-		attack: 0,
-		attackCurve: "exponential",
-		decay: 0,
-		decayCurve: "exponential",
-		release: 0,
-		releaseCurve: "exponential",
-		sustain: 0.1
-	},
-	oscillator: {
-		partialCount: 0,
-		partials: [],
-		phase: 0,
-		type: "pulse",
-		width: 0.25
-	}
+    volume: -35,
+    detune: 0,
+    portamento: 0,
+    envelope: {
+        attack: 0,
+        attackCurve: "exponential",
+        decay: 0,
+        decayCurve: "exponential",
+        release: 0,
+        releaseCurve: "exponential",
+        sustain: 0.1
+    },
+    oscillator: {
+        partialCount: 0,
+        partials: [],
+        phase: 0,
+        type: "pulse",
+        width: 0.25
+    }
 }).toDestination().connect(crusher);
 
 const synth2 = new Tone.Synth({
-	volume: -35,
-	detune: 0,
-	portamento: 0,
-	envelope: {
-		attack: 0,
-		attackCurve: "exponential",
-		decay: 0,
-		decayCurve: "exponential",
-		release: 1,
-		releaseCurve: "exponential",
-		sustain: 0.1
-	},
-	oscillator: {
-		partialCount: 0,
-		partials: [],
-		phase: 0,
-		type: "pulse",
-		width: 0.12
-	}
+    volume: -35,
+    detune: 0,
+    portamento: 0,
+    envelope: {
+        attack: 0,
+        attackCurve: "exponential",
+        decay: 0,
+        decayCurve: "exponential",
+        release: 1,
+        releaseCurve: "exponential",
+        sustain: 0.1
+    },
+    oscillator: {
+        partialCount: 0,
+        partials: [],
+        phase: 0,
+        type: "pulse",
+        width: 0.12
+    }
 }).connect(crusher).connect(reverb).toDestination();
 
 const synth3 = new Tone.Synth({
-	volume: -30,
-	detune: 0,
-	portamento: 0,
-	envelope: {
-		attack: 0,
-		attackCurve: "exponential",
-		decay: 0,
-		decayCurve: "exponential",
-		release: 0,
-		releaseCurve: "exponential",
-		sustain: 0.1
-	},
-	oscillator: {
-		partialCount: 0,
-		partials: [],
-		phase: 0,
-		type: "pulse",
-		width: 0.50
-	}
+    volume: -30,
+    detune: 0,
+    portamento: 0,
+    envelope: {
+        attack: 0,
+        attackCurve: "exponential",
+        decay: 0,
+        decayCurve: "exponential",
+        release: 0,
+        releaseCurve: "exponential",
+        sustain: 0.1
+    },
+    oscillator: {
+        partialCount: 0,
+        partials: [],
+        phase: 0,
+        type: "pulse",
+        width: 0.50
+    }
 }).connect(crusher).toDestination();
 
 const bassSynth = new Tone.Synth({
-	volume: -15,
-	detune: 0,
-	portamento: 0,
-	envelope: {
-		attack: 0,
-		attackCurve: "exponential",
-		decay: 0.3,
-		decayCurve: "exponential",
-		release: 0,
-		releaseCurve: "exponential",
-		sustain: 0
-	},
-	oscillator: {
-		partialCount: 0,
-		partials: [],
-		phase: 0,
-		type: "amtriangle",
-		harmonicity: 1,
-		modulationIndex: 2,
-		modulationType: "square"
-	}
+    volume: -15,
+    detune: 0,
+    portamento: 0,
+    envelope: {
+        attack: 0,
+        attackCurve: "exponential",
+        decay: 0.3,
+        decayCurve: "exponential",
+        release: 0,
+        releaseCurve: "exponential",
+        sustain: 0
+    },
+    oscillator: {
+        partialCount: 0,
+        partials: [],
+        phase: 0,
+        type: "amtriangle",
+        harmonicity: 1,
+        modulationIndex: 2,
+        modulationType: "square"
+    }
 }).toDestination().connect(crusher);
 
 // Scales
@@ -411,7 +386,6 @@ let bassRoot = root - 24;
 let bpm = 100;
 let progressionIndex = 0;
 let cAutomaton = new Algo.Automaton();
-let cAutomaton2 = new Algo.Automaton();
 
 // Synths Parts
 const bassPart = new Tone.Part((time, value) => {
@@ -426,21 +400,21 @@ const timeBetween = Tone.Time("32t").toSeconds();
 
 const synth2Part = new Tone.Part((time, value) => {
     synth2.triggerAttackRelease(value.note, "16n", time, value.velocity);
-    synth2.triggerAttackRelease(value.note * 1.5, "16n", time + timeBetween , value.velocity - 0.25);
+    synth2.triggerAttackRelease(value.note * 1.5, "16n", time + timeBetween, value.velocity - 0.25);
     synth2.triggerAttackRelease(value.note, "16n", time + 2 * timeBetween, value.velocity - 0.30);
-    synth2.triggerAttackRelease(value.note * 2/3, "16n", time + 3 * timeBetween , value.velocity - 0.35);
+    synth2.triggerAttackRelease(value.note * 2 / 3, "16n", time + 3 * timeBetween, value.velocity - 0.35);
     synth2.triggerAttackRelease(value.note, "16n", time + 4 * timeBetween, value.velocity - 0.40);
-    synth2.triggerAttackRelease(value.note * 1.5, "16n", time + 5 * timeBetween , value.velocity - 0.45);
+    synth2.triggerAttackRelease(value.note * 1.5, "16n", time + 5 * timeBetween, value.velocity - 0.45);
     synth2.triggerAttackRelease(value.note, "16n", time + 6 * timeBetween, value.velocity - 0.50);
-    synth2.triggerAttackRelease(value.note * 2/3, "16n", time + 7 * timeBetween , value.velocity - 0.55);
+    synth2.triggerAttackRelease(value.note * 2 / 3, "16n", time + 7 * timeBetween, value.velocity - 0.55);
     synth2.triggerAttackRelease(value.note, "16n", time + 8 * timeBetween, value.velocity - 0.60);
-    synth2.triggerAttackRelease(value.note * 1.5, "16n", time + 9 * timeBetween , value.velocity - 0.65);
+    synth2.triggerAttackRelease(value.note * 1.5, "16n", time + 9 * timeBetween, value.velocity - 0.65);
     synth2.triggerAttackRelease(value.note, "16n", time + 10 * timeBetween, value.velocity - 0.70);
-    synth2.triggerAttackRelease(value.note * 2/3, "16n", time + 11 * timeBetween , value.velocity - 0.75);
+    synth2.triggerAttackRelease(value.note * 2 / 3, "16n", time + 11 * timeBetween, value.velocity - 0.75);
     synth2.triggerAttackRelease(value.note, "16n", time + 12 * timeBetween, value.velocity - 0.80);
-    synth2.triggerAttackRelease(value.note * 1.5, "16n", time + 13 * timeBetween , value.velocity - 0.85);
+    synth2.triggerAttackRelease(value.note * 1.5, "16n", time + 13 * timeBetween, value.velocity - 0.85);
     synth2.triggerAttackRelease(value.note, "16n", time + 14 * timeBetween, value.velocity - 0.9);
-    synth2.triggerAttackRelease(value.note * 2/3, "16n", time + 15 * timeBetween , value.velocity - 0.95);
+    synth2.triggerAttackRelease(value.note * 2 / 3, "16n", time + 15 * timeBetween, value.velocity - 0.95);
 }).start("+0.1");
 
 const synth3Part = new Tone.Part((time, value) => {
@@ -471,28 +445,51 @@ function fillDrums() {
     hhPart.clear();
     snarePart.clear();
     if (true) {
-        for (let i = 0; i < 128; i++) {
-            if (i % 8 == 0 || i == 0) {
-                kickPattern.push({ time: time, note: 20, velocity: 1 });
-                drumNotes.push("KCK");
-            } else if (i % 8 == 4) {
-                snarePattern.push({ time: time, note: 60, velocity: 1 });
-                drumNotes.push("SNR");
-            } else if (i % 8 == 2) {
-                if (Rand.pick(1, [1, 2, 3, 4, 5]) == 1) {
+        if (Rand.coin(1)[0]) {
+            for (let i = 0; i < 128; i++) {
+                if (i % 8 == 0 || i == 0) {
                     kickPattern.push({ time: time, note: 20, velocity: 1 });
                     drumNotes.push("KCK");
+                } else if (i % 8 == 4) {
+                    snarePattern.push({ time: time, note: 60, velocity: 1 });
+                    drumNotes.push("SNR");
+                } else if (i % 8 == 2) {
+                    if (Rand.pick(1, [1, 2, 3, 4, 5]) == 1) {
+                        kickPattern.push({ time: time, note: 20, velocity: 1 });
+                        drumNotes.push("KCK");
+                    } else {
+                        hihatPattern.push({ time: time, note: 30, velocity: 1 });
+                        drumNotes.push("HH");
+                    }
                 } else {
                     hihatPattern.push({ time: time, note: 30, velocity: 1 });
                     drumNotes.push("HH");
                 }
-            } else {
-                hihatPattern.push({ time: time, note: 30, velocity: 1 });
-                drumNotes.push("HH");
-            }
 
-            time = time + seconds;
+                time = time + seconds;
+            }
+        } else {
+            for (let i = 0; i < 128; i++) {
+                if (i % 4 == 0 || i == 0) {
+                    kickPattern.push({ time: time, note: 20, velocity: 1 });
+                    drumNotes.push("KCK");
+                } else if (i % 4 == 2) {
+                    snarePattern.push({ time: time, note: 60, velocity: 1 });
+                    drumNotes.push("SNR");
+                } else {
+                    if (Rand.pick(1, [1, 2, 3, 4, 5]) == 1) {
+                        kickPattern.push({ time: time, note: 20, velocity: 1 });
+                        drumNotes.push("KCK");
+                    } else {
+                        hihatPattern.push({ time: time, note: 30, velocity: 1 });
+                        drumNotes.push("HH");
+                    }
+                }
+
+                time = time + seconds;
+            }
         }
+
 
         for (let i = 0; i < kickPattern.length; i++) {
             kickPart.add(kickPattern[i]);
@@ -541,9 +538,9 @@ function fill2MelodyArray(melody) {
         if (melody[i] != 0) {
             melodyArray.push({
                 time: time,
-                duration: Rand.choose(1, ["32n" , "16n", "8n", "4n"])[0],
+                duration: Rand.choose(1, ["32n", "16n", "8n", "4n"])[0],
                 note: Tone.Frequency(melody[i], "midi").toFrequency(),
-                velocity: Rand.choose(1, [1 , 0.9, 0.8, 0.7]),
+                velocity: Rand.choose(1, [1, 0.9, 0.8, 0.7]),
             });
         }
         time = time + seconds;
@@ -567,7 +564,7 @@ function generateBassMelody() {
             //euclidean
             for (let i = 0; i < 4; i++) {
                 for (let j = 0; j < 32; j++) {
-                    note = (bassRoot + currentChords[i][Rand.random(1, 0, currentChords[i].length)]) * euclid[auxIndex];
+                    note = (bassRoot + currentChords[i][Rand.random(1, 0, currentChords[i].length)[0]]) * euclid[auxIndex];
                     bassNotes.push(note);
 
                     auxIndex++;
@@ -750,6 +747,7 @@ export default {
     components: {
         HelloWorld,
         Tone,
+        Midi,
     },
     data() {
         return {
@@ -758,7 +756,7 @@ export default {
             synthVolume: -35,
             synth2Volume: -35,
             synth3Volume: -30,
-            drumsVolume: -20,
+            drumsVolume: -18,
             bassNotes: {},
             synth1Notes: {},
             synth2Notes: {},
@@ -878,6 +876,9 @@ export default {
         }
     },
     methods: {
+        downloadMidi() {
+
+        },
         changeTempo() {
             Tone.Transport.bpm.rampTo(this.tempo, 0.001);
         },
@@ -906,8 +907,6 @@ export default {
                 // feed with 40 randomly generated values 0-1
                 cAutomaton.feed(Rand.coin(128));
                 cAutomaton.rule(Rand.random(1, 1, 200)[0]);
-                cAutomaton2.feed(Rand.coin(128));
-                cAutomaton2.rule(Rand.random(1, 1, 200)[0]);
 
                 Tone.start();
                 Tone.Transport.bpm.rampTo(this.tempo, 0.001);
@@ -986,19 +985,21 @@ export default {
             this.progressTick == 128 ? (this.progressTick = 0) : (this.progressTick = this.progressTick + 1);
         },
         setBassOptions() {
-            bassSynth.set({volume:this.bassVolume})
+            bassSynth.set({ volume: this.bassVolume })
         },
         setSynth1Options() {
-            synth.set({volume:this.synthVolume})
+            synth.set({ volume: this.synthVolume })
         },
         setSynth2Options() {
-            synth2.set({volume:this.synth2Volume})
+            synth2.set({ volume: this.synth2Volume })
         },
         setSynth3Options() {
-            synth3.set({volume:this.synth3Volume})
+            synth3.set({ volume: this.synth3Volume })
         },
         setDrumsOptions() {
-            bassSynth.set({volume:this.bassVolume})
+            kickSynth.set({ volume: this.drumsVolume })
+            snareSynth.set({ volume: this.drumsVolume - 2 })
+            hihatSynth.set({ volume: this.drumsVolume - 12 })
         },
         chooseRoot() {
             let rootString = "";
@@ -1020,7 +1021,7 @@ export default {
         setRoot() {
             let upOrDown = Rand.random(1, 0, 1)[0];
 
-            if (this.context.root != "") {
+            if (this.context.root == "") {
                 if (upOrDown == 0) {
                     root = (root + 7) % 12;
                 } else {

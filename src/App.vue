@@ -1,10 +1,10 @@
 <template>
     <div class="appBackground">
         <div class="h-24">
-        <h1 class="text-[100px] appTitle font-['8_Bit_Arcade'] text-white">Algorithmic Tracker</h1>
+        <h1 class="text-[50px] md:text-[100px] appTitle font-['8_Bit_Arcade'] text-white">Algorithmic Tracker</h1>
         </div>
         <div class="z-10">
-        <nav>
+        <nav class="text-white">
             <router-link class="text-[40px] text-white navText font-['8_Bit_Arcade']" to="/">home</router-link> |
             <router-link class="text-[40px] text-white navText font-['8_Bit_Arcade']" to="/about">about</router-link>
         </nav>
@@ -49,19 +49,7 @@ nav a.router-link-exact-active {
     src: url("~@/assets/fonts/8-bit Arcade In.ttf");
 }
 
-/* .appTitle{
-    -webkit-text-stroke: 4px black;
-    text-shadow: 1px 9px 1px black;
-    font-weight: bold;
-}
-
-.navText{
-    -webkit-text-stroke: 1px black;
-    text-shadow: 1px 3px 1px black;
-    font-weight: bold;
-} */
-
 .appBackground {
-background-color: #000000b0;
+background-image: url("~@/assets/bg.png");
 }
 </style>
